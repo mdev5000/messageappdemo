@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func tMessageRepository(db *postgres.DB) *MessageRepository {
+func tMessageRepository(db *postgres.DB) *MessagesRepository {
 	return NewMessageRepository(db)
 }
 
@@ -60,7 +60,7 @@ func TestMessageRepository_DeleteById_canDeleteMessagesById(t *testing.T) {
 	var m Message
 	err = mr.GetById(id, &m)
 	require.True(t, errors.Is(err, IdMissingError{}))
-	require.Error(t, err, "no rows in result set for message with id %s", id)
+	require.Error(t, err, "messages repository: no rows in result for get by id with id %d", id)
 }
 
 func TestMessageRepository_DeleteById_onlyDeletesTheSpecifiedId(t *testing.T) {
@@ -89,4 +89,14 @@ func TestMessageRepository_DeleteById_onlyDeletesTheSpecifiedId(t *testing.T) {
 	sort.Slice(messageIds, func(i, j int) bool { return i < j })
 
 	require.Equal(t, []MessageId{id1, id3}, messageIds, "only ids of existing rows are still present")
+}
+
+func TestMessageRepository_DeleteById_returnsErrorWhenNoRowsAreDeleted(t *testing.T) {
+	db, closeDb := acquireDb()
+	defer closeDb()
+	mr := tMessageRepository(db)
+
+	err := mr.DeleteById(5)
+	require.EqualError(t, err,
+		"messages repository: expected delete by id to delete 1 row but 0 were deleted")
 }

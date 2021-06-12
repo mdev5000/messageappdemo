@@ -3,5 +3,6 @@
 *.swp
 
 # ignored folders
+/.vscode/
 /.idea/
-/tmp/
+/_tmp/

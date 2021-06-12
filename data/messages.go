@@ -13,25 +13,7 @@ create table if not exists messages (
 );
 `
 
-const messageDbTableName = "messages"
-
-type IdMissingError struct {
-	Type string
-	Id   int64
-}
-
-func (e IdMissingError) Error() string {
-	return fmt.Sprintf("no rows in result set for %s with id %d", e.Type, e.Id)
-}
-
-func (e IdMissingError) Is(target error) bool {
-	switch target.(type) {
-	case IdMissingError:
-		return true
-	default:
-		return false
-	}
-}
+const RepositoryIdentifierMessages = "messages"
 
 type MessageId = int64
 type MessageVersion = int
@@ -46,15 +28,15 @@ type CreateMessage struct {
 	Message string `sharedDbInstance:"message"`
 }
 
-type MessageRepository struct {
+type MessagesRepository struct {
 	db *postgres.DB
 }
 
-func NewMessageRepository(db *postgres.DB) *MessageRepository {
-	return &MessageRepository{db: db}
+func NewMessageRepository(db *postgres.DB) *MessagesRepository {
+	return &MessagesRepository{db: db}
 }
 
-func (mr *MessageRepository) DeleteById(id MessageId) error {
+func (mr *MessagesRepository) DeleteById(id MessageId) error {
 	r, err := mr.db.Exec(`delete from messages where id = $1`, id)
 	if err != nil {
 		return err
@@ -64,18 +46,21 @@ func (mr *MessageRepository) DeleteById(id MessageId) error {
 		return err
 	}
 	if affected != 1 {
-		return fmt.Errorf("expected 1 row to be deleted by id but was %d", affected)
+		return repoError(
+			RepositoryIdentifierMessages,
+			fmt.Errorf("expected delete by id to delete 1 row but %d were deleted", affected))
 	}
 	return nil
 }
 
-func (mr *MessageRepository) Create(cm CreateMessage) (MessageId, error) {
+func (mr *MessagesRepository) Create(cm CreateMessage) (MessageId, error) {
 	rows, err := mr.db.Query(`insert into messages (version, message) values (1, $1) returning id`, cm.Message)
 	if err != nil {
 		return 0, err
 	}
 	if !rows.Next() {
-		return 0, fmt.Errorf("expected 1 creation rows, but none present")
+		return 0, repoError(RepositoryIdentifierMessages,
+			fmt.Errorf("create message expected 1 row returned by was 0"))
 	}
 	var id MessageId
 	err = rows.Scan(&id)
@@ -87,22 +72,20 @@ func (mr *MessageRepository) Create(cm CreateMessage) (MessageId, error) {
 		numRow += 1
 	}
 	if numRow != 1 {
-		return id, fmt.Errorf("unexpected number of rows expected %d, but was %d", 1, numRow)
+		return id, repoError(RepositoryIdentifierMessages,
+			fmt.Errorf("unexpected number of rows expected %d, but was %d", 1, numRow))
 	}
 	return id, nil
 }
 
-func (mr *MessageRepository) GetAll(messages *[]*Message) error {
+func (mr *MessagesRepository) GetAll(messages *[]*Message) error {
 	return mr.db.Select(messages, `select id, version, message from messages`)
 }
 
-func (mr *MessageRepository) GetById(id MessageId, m *Message) error {
+func (mr *MessagesRepository) GetById(id MessageId, m *Message) error {
 	if err := mr.db.Get(m, `select id, version, message from messages where id=$1`, id); err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return IdMissingError{
-				Type: messageDbTableName,
-				Id:   id,
-			}
+			return idMissingError(RepositoryIdentifierMessages, id)
 		}
 		return err
 	}
