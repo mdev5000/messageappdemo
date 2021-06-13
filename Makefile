@@ -3,7 +3,7 @@
 # -------------------------------------------------------
 
 # This should be run prior to any commits, runs the various tools that should pass before committing code.
-precommit: fmt test.race cover lint
+precommit: fmt test.race.nocache cover lint
 
 
 
@@ -41,6 +41,10 @@ vet:
 # TESTING + CODE COVERAGE
 # -------------------------------------------------------
 
+# Same as test.race but clears the test cache first.
+test.race.nocache:
+	go clean -testcache && go test -race ./...
+
 # Run all tests with the race detector enabled.
 test.race:
 	go test -race ./...
@@ -48,6 +52,11 @@ test.race:
 # Run all tests for the project.
 test:
 	go test ./...
+
+# Run only test that are not related to the database. Database test can be slow to run this is helpful when you are
+# mostly running unit and fast integration tests.
+test.nodb:
+	NODB=1 go test ./...
 
 # Print code coverage.
 cover:
@@ -66,7 +75,7 @@ cover.report:
 
 # This should be run prior to any commits, runs the various tools that should pass before committing code.
 dev.run:
-	UID=$${UID} GID=$${GID} docker-compose up -d
+	docker-compose up -d
 
 
 

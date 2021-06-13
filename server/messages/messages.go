@@ -2,15 +2,27 @@ package messages
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/mdev5000/qlik_message/apperrors"
 	"github.com/mdev5000/qlik_message/logging"
 	"github.com/mdev5000/qlik_message/messages"
 	"github.com/mdev5000/qlik_message/server/handler"
 	"github.com/mdev5000/qlik_message/server/uris"
 	"net/http"
+	"strconv"
+	"time"
 )
 
-type createdJson struct {
+type createJSON struct {
 	Message string `json:"message"`
+}
+
+type MessageResponseJSON struct {
+	Id        messages.MessageId      `json:"id"`
+	Version   messages.MessageVersion `json:"version"`
+	CreatedAt time.Time               `json:"created_at"`
+	UpdatedAt time.Time               `json:"updated_at"`
+	Message   string                  `json:"message"`
 }
 
 type Handler struct {
@@ -27,8 +39,9 @@ func NewHandler(log *logging.Logger, messageSvc *messages.Service) *Handler {
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	const op = "MessagesHandler.Create"
-	var resp createdJson
-	if err := handler.DecodeJsonOrError(w, r, &resp); err != nil {
+
+	var resp createJSON
+	if !handler.DecodeJsonOrError(h.log, op, w, r, &resp) {
 		return
 	}
 
@@ -36,7 +49,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		Message: resp.Message,
 	})
 	if err != nil {
-		handler.SendErrorResponse(h.log, op, err, w)
+		handler.SendErrorResponse(h.log, op, w, err)
 		return
 	}
 
@@ -45,7 +58,31 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Read(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("read")
+	const op = "MessagesHandler.Read"
+
+	vars := mux.Vars(r)
+	ids := vars["id"]
+	id, err := strconv.Atoi(ids)
+	if err != nil {
+		appErr := apperrors.Error{Op: op}
+		appErr.AddResponse(apperrors.ErrorResponse("invalid message id"))
+		handler.SendErrorResponse(h.log, op, w, &appErr)
+		return
+	}
+
+	message, err := h.messagesSvc.Read(int64(id))
+	if err != nil {
+		handler.SendErrorResponse(h.log, op, w, err)
+		return
+	}
+
+	handler.EncodeJsonOrError(op, h.log, w, MessageResponseJSON{
+		Id:        message.Id,
+		Version:   message.Version,
+		CreatedAt: message.CreatedAt,
+		UpdatedAt: message.UpdatedAt,
+		Message:   message.Message,
+	})
 }
 
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {

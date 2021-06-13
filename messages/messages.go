@@ -13,6 +13,9 @@ type CreateMessage struct {
 }
 
 type MessageId = data.MessageId
+type MessageVersion = data.MessageVersion
+
+type Message = data.Message
 
 type Service struct {
 	log  *logging.Logger
@@ -30,7 +33,7 @@ func (ms *Service) Create(message CreateMessage) (MessageId, error) {
 	const op = "MessagesService.Create"
 
 	if message.Message == "" {
-		re := apperrors.Error{Op: op}
+		re := apperrors.Error{Op: op, EType: apperrors.ETInvalid}
 		re.AddResponse(apperrors.FieldErrorResponse{
 			Field: "message",
 			Error: "Message field cannot be blank.",
@@ -48,4 +51,10 @@ func (ms *Service) Create(message CreateMessage) (MessageId, error) {
 		return id, err
 	}
 	return id, err
+}
+
+func (ms *Service) Read(id MessageId) (*Message, error) {
+	var message Message
+	err := ms.repo.GetById(id, &message)
+	return &message, err
 }

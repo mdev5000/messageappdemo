@@ -1,5 +1,7 @@
 package data
 
+import "github.com/mdev5000/qlik_message/postgres"
+
 const Schema = `
 create table if not exists messages (
 	id serial,
@@ -9,3 +11,15 @@ create table if not exists messages (
     message text not null
 );
 `
+
+func SetupSchema(db *postgres.DB) error {
+	_, err := db.Exec(Schema)
+	return err
+}
+
+func PurgeDb(db *postgres.DB) error {
+	if _, err := db.Exec("delete from messages"); err != nil {
+		return err
+	}
+	return nil
+}

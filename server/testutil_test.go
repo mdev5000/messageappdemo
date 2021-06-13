@@ -1,6 +1,11 @@
 package server
 
 import (
+	"bytes"
+	"github.com/mdev5000/qlik_message/data"
+	"github.com/mdev5000/qlik_message/logging"
+	"github.com/mdev5000/qlik_message/messages"
+	"github.com/mdev5000/qlik_message/postgres"
 	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
@@ -48,6 +53,21 @@ func noDbServe(t *testing.T, w http.ResponseWriter, r *http.Request) {
 	noDbHandler(t).ServeHTTP(w, r)
 }
 
+func handlerWithDb(t *testing.T, db *postgres.DB) http.Handler {
+	log := logging.NoLog()
+	messagesRepo := data.NewMessageRepository(db)
+	h, err := Handler(Services{
+		Log:             log,
+		MessagesService: messages.NewService(log, messagesRepo),
+	}, Config{LogRequest: false})
+	require.NoError(t, err)
+	return h
+}
+
+//func serve(t *testing.T, db *postgres.DB, w http.ResponseWriter, r *http.Request) {
+//	handlerWithDb(t, db).ServeHTTP(w, r)
+//}
+
 func requestEmpty(t *testing.T, method, url string) *http.Request {
 	return request(t, method, url, nil)
 }
@@ -57,4 +77,9 @@ func request(t *testing.T, method, url string, body io.Reader) *http.Request {
 	require.NoError(t, err)
 	req.Header.Set("Content-Type", "application/json")
 	return req
+}
+
+func requestString(t *testing.T, method, url string, body string) *http.Request {
+	b := bytes.NewBufferString(body)
+	return request(t, method, url, b)
 }

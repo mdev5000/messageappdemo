@@ -54,7 +54,7 @@ func ToJSON(encoder *json.Encoder, err error) error {
 		case ETInvalid:
 			return encoder.Encode(errResponse{e.Responses})
 		default:
-			return fmt.Errorf("error type does not support encoding user response (error type: %s)", e.EType)
+			return fmt.Errorf("error type for JSON, expected %s, but was %s", ETInvalid, e.EType)
 		}
 	default:
 		return fmt.Errorf("error is not an application error, err: %w", err)
@@ -73,4 +73,12 @@ func IsInternal(err error) bool {
 type FieldErrorResponse struct {
 	Field string `json:"field"`
 	Error string `json:"error"`
+}
+
+type ErrResponse struct {
+	Error string `json:"error"`
+}
+
+func ErrorResponse(errMsg string) ErrResponse {
+	return ErrResponse{Error: errMsg}
 }

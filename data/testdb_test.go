@@ -66,6 +66,11 @@ func setupDbSchema() error {
 }
 
 func TestMain(m *testing.M) {
+	// Don't run any database tests.
+	if os.Getenv("NODB") == "1" {
+		os.Exit(0)
+	}
+
 	// Setup a running PostgreSQL instance.
 	pool, resource, err := setupDbPool()
 	if err != nil {

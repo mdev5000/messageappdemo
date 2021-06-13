@@ -5,6 +5,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/mdev5000/qlik_message/apperrors"
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
 	"os"
 )
 
@@ -42,6 +43,14 @@ type Fields = logrus.Fields
 // Dump creates a string representation of a value. Using the spew library to provide more detail.
 func Dump(value ...interface{}) string {
 	return spew.Sdump(value...)
+}
+
+func NoLog() *Logger {
+	l := Logger{
+		Logger: *logrus.New(),
+	}
+	l.Logger.SetOutput(ioutil.Discard)
+	return &l
 }
 
 func New() *Logger {
