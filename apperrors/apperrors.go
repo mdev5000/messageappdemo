@@ -1,0 +1,76 @@
+package apperrors
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type errResponse struct {
+	Errors []interface{} `json:"errors"`
+}
+
+// Error https://middlemost.com/failure-is-your-domain/
+type Error struct {
+	// The type of error. Determines how the error is handled, ex. ETInternal errors would result in internal logging
+	// of the error and a 500 response code being returned to the user.
+	EType string
+
+	// Descriptor of the operation that caused the error. Ex. MessagesService.Create.
+	Op string
+
+	Err error
+
+	// An error containing the full stack trace to the source of the error.
+	Stack error
+
+	// A list of error responses to return to the user.
+	Responses []interface{}
+}
+
+func (e *Error) AddResponse(r interface{}) {
+	e.Responses = append(e.Responses, r)
+}
+
+func (e *Error) Error() string {
+	return fmt.Sprintf("Error [%s] (%s): %s", e.EType, e.Op, e.Err)
+}
+
+func (e *Error) Unwrap() error {
+	return e.Err
+}
+
+func (e *Error) Is(err error) bool {
+	switch err.(type) {
+	case *Error:
+		return true
+	}
+	return false
+}
+
+func ToJSON(encoder *json.Encoder, err error) error {
+	switch e := err.(type) {
+	case *Error:
+		switch e.EType {
+		case ETInvalid:
+			return encoder.Encode(errResponse{e.Responses})
+		default:
+			return fmt.Errorf("error type does not support encoding user response (error type: %s)", e.EType)
+		}
+	default:
+		return fmt.Errorf("error is not an application error, err: %w", err)
+	}
+}
+
+func IsInternal(err error) bool {
+	switch e := err.(type) {
+	case *Error:
+		return e.EType == ETInternal
+	default:
+		return true
+	}
+}
+
+type FieldErrorResponse struct {
+	Field string `json:"field"`
+	Error string `json:"error"`
+}

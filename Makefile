@@ -1,5 +1,5 @@
 
-# DEPENDENCIES
+# PRE COMMIT
 # -------------------------------------------------------
 
 # This should be run prior to any commits, runs the various tools that should pass before committing code.
@@ -58,6 +58,15 @@ cover.report:
 	@mkdir -p _tmp
 	@go test -coverprofile _tmp/coverage.out ./...
 	@go tool cover -html _tmp/coverage.out
+
+
+
+# DEV
+# -------------------------------------------------------
+
+# This should be run prior to any commits, runs the various tools that should pass before committing code.
+dev.run:
+	UID=$${UID} GID=$${GID} docker-compose up -d
 
 
 

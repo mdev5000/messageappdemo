@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"github.com/mdev5000/qlik_message/apperrors"
 	"github.com/pkg/errors"
 )
 
@@ -27,24 +28,15 @@ func (e IdMissingError) Is(target error) bool {
 	}
 }
 
-func repoError(repo string, err error) error {
-	return errors.WithStack(RepositoryError{RepositoryIdentifier: repo, Err: err})
+func repoError2(op string, err error) error {
+	return repoError(op, err, err)
 }
 
-type RepositoryError struct {
-	RepositoryIdentifier string
-	Err                  error
-}
-
-func (e RepositoryError) Error() string {
-	return fmt.Sprintf("%s repository: %s", e.RepositoryIdentifier, e.Err.Error())
-}
-
-func (e RepositoryError) Is(target error) bool {
-	switch target.(type) {
-	case RepositoryError:
-		return true
-	default:
-		return false
+func repoError(op string, err, errOrig error) error {
+	return &apperrors.Error{
+		EType: apperrors.ETInternal,
+		Op:    op,
+		Err:   err,
+		Stack: errors.WithStack(errOrig),
 	}
 }

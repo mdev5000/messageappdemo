@@ -17,13 +17,20 @@ func TestMessageRepository_Create_canCreateNewMessages(t *testing.T) {
 	defer closeDb()
 	mr := tMessageRepository(db)
 
-	id, err := mr.Create(CreateMessage{Message: "my message"})
+	now := NowUTC()
+
+	id, err := mr.Create(CreateMessage{
+		Message:   "my message",
+		CreatedAt: now,
+	})
 	require.NoError(t, err)
 
 	var m Message
 	require.NoError(t, mr.GetById(id, &m))
 	require.Equal(t, 1, m.Version)
 	require.Equal(t, "my message", m.Message)
+	require.True(t, now.Equal(m.CreatedAt))
+	require.True(t, now.Equal(m.UpdatedAt))
 }
 
 func TestMessageRepository_GetById(t *testing.T) {
@@ -98,5 +105,5 @@ func TestMessageRepository_DeleteById_returnsErrorWhenNoRowsAreDeleted(t *testin
 
 	err := mr.DeleteById(5)
 	require.EqualError(t, err,
-		"messages repository: expected delete by id to delete 1 row but 0 were deleted")
+		"Error [internal] (MessagesRepository.DeleteById): expected delete by id to delete 1 row but 0 were deleted")
 }

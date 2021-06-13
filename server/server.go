@@ -3,20 +3,46 @@ package server
 import (
 	"fmt"
 	gmux "github.com/gorilla/mux"
+	"github.com/mdev5000/qlik_message/logging"
+	"github.com/mdev5000/qlik_message/messages"
 	msgs "github.com/mdev5000/qlik_message/server/messages"
 	"github.com/urfave/negroni"
 	"net/http"
 	"strings"
 )
 
+type Services struct {
+	Log             *logging.Logger
+	MessagesService *messages.Service
+}
+
 type Config struct {
 	LogRequest bool
 }
 
-func Handler(cfg Config) (http.Handler, error) {
-	mux := gmux.NewRouter()
+func standardServiceMiddleware(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// This service only accepts json, so indicate to the client.
+		w.Header().Set("Accept", "application/json")
 
-	messageHandler := msgs.NewHandler()
+		// Ensure the content type is correctly set to json
+		switch r.Method {
+		case "GET", "POST", "PUT", "DELETE":
+			if r.Header.Get("Content-Type") != "application/json" {
+				w.WriteHeader(http.StatusNotAcceptable)
+				return
+			}
+		}
+
+		handler.ServeHTTP(w, r)
+	})
+}
+
+func Handler(svc Services, cfg Config) (http.Handler, error) {
+	mux := gmux.NewRouter()
+	mux.Use(standardServiceMiddleware)
+
+	messageHandler := msgs.NewHandler(svc.Log, svc.MessagesService)
 	messages := mux.PathPrefix("/messages").Subrouter()
 	messages.HandleFunc("", messageHandler.Create).Methods("POST")
 	messages.HandleFunc("", messageHandler.List).Methods("GET")
