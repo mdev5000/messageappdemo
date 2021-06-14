@@ -7,7 +7,7 @@ import (
 )
 
 func idMissingError(repo string, id int64) error {
-	return errors.WithStack(IdMissingError{RepositoryIdentifier: repo, Id: id})
+	return IdMissingError{RepositoryIdentifier: repo, Id: id}
 }
 
 type IdMissingError struct {

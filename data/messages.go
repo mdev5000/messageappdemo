@@ -1,16 +1,16 @@
 package data
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/mdev5000/qlik_message/postgres"
-	"github.com/pkg/errors"
+	"strings"
 	"time"
 )
 
 const RepositoryIdentifierMessages = "messages"
-
-var NoChangesInUpdateError = errors.New("no changes made in update call")
 
 type MessageId = int64
 type MessageVersion = int
@@ -23,8 +23,10 @@ type Message struct {
 	Message   string         `db:"message"`
 }
 
-type CreateMessage struct {
-	Message   string    `db:"message"`
+type ModifyMessage struct {
+	Message string `db:"message"`
+
+	// CreatedAt is only used for creation of a message and will be ignored for update operations.
 	CreatedAt time.Time `db:"created_at"`
 }
 
@@ -37,6 +39,15 @@ func NewMessageRepository(db *postgres.DB) *MessagesRepository {
 }
 
 const repoName = "MessagesRepository"
+
+// Map of fields the user is allowed to query in format {field: table_col}
+var queryableFields = map[string]string{
+	"id":        "id",
+	"version":   "version",
+	"createdAt": "created_at",
+	"updatedAt": "updated_at",
+	"message":   "message",
+}
 
 func (mr *MessagesRepository) DeleteById(id MessageId) error {
 	const op = repoName + ".DeleteById"
@@ -55,7 +66,7 @@ func (mr *MessagesRepository) DeleteById(id MessageId) error {
 }
 
 // Create creates a new message. Note that CreatedAt should be in the UTC-0 timezone.
-func (mr *MessagesRepository) Create(cm CreateMessage) (MessageId, error) {
+func (mr *MessagesRepository) Create(cm ModifyMessage) (MessageId, error) {
 	const op = repoName + ".Create"
 	rows, err := mr.db.Query(
 		`
@@ -86,7 +97,62 @@ values (1, $1, $1, $2) returning id
 }
 
 func (mr *MessagesRepository) GetAll(messages *[]*Message) error {
-	return mr.db.Select(messages, `select id, version, created_at, updated_at, message from messages`)
+	const op = repoName + ".GetAll"
+	if err := mr.db.Select(messages,
+		`select id, version, created_at, updated_at, message from messages`); err != nil {
+		return repoError(op, fmt.Errorf("failed to get messages: %w", err), err)
+	}
+	return nil
+}
+
+type MessageQuery struct {
+	Fields map[string]struct{}
+	Limit  uint64
+	Offset uint64
+}
+
+func (mr *MessagesRepository) GetAllQuery(query MessageQuery, messages *[]*Message) error {
+	const op = repoName + ".GetAllQuery"
+
+	var cols []string
+	if len(query.Fields) == 0 {
+		cols = make([]string, 0, len(queryableFields))
+		for _, col := range queryableFields {
+			cols = append(cols, col)
+		}
+	} else {
+		cols = make([]string, 0, len(query.Fields))
+		var notFound []string
+		for field := range query.Fields {
+			col, found := queryableFields[field]
+			if found {
+				cols = append(cols, col)
+			} else {
+				notFound = append(notFound, field)
+			}
+		}
+		if len(notFound) != 0 {
+			return repoError2(op, fmt.Errorf("invalid messages fields: %s", strings.Join(notFound, ",")))
+		}
+	}
+
+	q := sq.Select(cols...).From("messages")
+	if query.Limit > 0 {
+		q = q.Limit(query.Limit)
+	}
+	if query.Offset > 0 {
+		q = q.Offset(query.Offset)
+	}
+
+	sqlS, args, err := q.ToSql()
+	if err != nil {
+		return repoError(op, fmt.Errorf("failed to generate messages query:\n%w", err), err)
+	}
+	if err := mr.db.Select(messages, sqlS, args...); err != nil {
+		return repoError(op,
+			fmt.Errorf("failed to run messages query\nquery: %s\nargs: %+v\n%w", sqlS, args, err), err)
+	}
+	return nil
 }
 
 func (mr *MessagesRepository) GetById(id MessageId, m *Message) error {
@@ -100,33 +166,32 @@ func (mr *MessagesRepository) GetById(id MessageId, m *Message) error {
 	return nil
 }
 
-func (mr *MessagesRepository) UpdateById(id MessageId, m Message) (MessageVersion, error) {
+func (mr *MessagesRepository) UpdateById(id MessageId, m ModifyMessage) (MessageVersion, error) {
 	const op = repoName + ".UpdateById"
+
 	q := sq.Update("messages").
 		PlaceholderFormat(sq.Dollar).
 		Set("version", sq.Expr("version + 1")).
 		Set("updated_at", NowUTC()).
 		Where(sq.Eq{"id": id})
 
-	hasSetField := false
-	if m.Message != "" {
-		hasSetField = true
-		q = q.Set("message", m.Message)
-	}
-	// No changes actually made, so don't do anything.
-	if !hasSetField {
-		return 0, repoError2(op, NoChangesInUpdateError)
-	}
-	sql, args, err := q.ToSql()
+	q = q.Set("message", m.Message)
+
+	sqlS, args, err := q.ToSql()
 	if err != nil {
 		return 0, repoError(op, fmt.Errorf("failed to generate update query: %w", err), err)
 	}
-	row := mr.db.QueryRow(sql+" returning version", args...)
+
+	row := mr.db.QueryRow(sqlS+" returning version", args...)
 	if err := row.Err(); err != nil {
 		return 0, repoError(op, fmt.Errorf("failed to update row: %w", err), err)
 	}
+
 	var version MessageVersion
 	if err := row.Scan(&version); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, repoError2(op, idMissingError(RepositoryIdentifierMessages, id))
+		}
 		return 0, repoError(op, fmt.Errorf("failed to scan version number: %w", err), err)
 	}
 	return version, nil

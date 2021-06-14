@@ -1,7 +1,8 @@
-package server
+package messages
 
 import (
 	"encoding/json"
+	"fmt"
 	msgs "github.com/mdev5000/qlik_message/messages"
 	"github.com/mdev5000/qlik_message/server/messages"
 	"github.com/mdev5000/qlik_message/server/uris"
@@ -46,7 +47,7 @@ func TestMessages_canCreateAMessage(t *testing.T) {
 	loc := rr.Header().Get("Location")
 	require.True(t, regexp.MustCompile("^/messages/[0-9]+$").MatchString(loc))
 
-	// Then retrieve it
+	// Then retrieve it.
 	rr2 := httptest.NewRecorder()
 	h.ServeHTTP(rr2, requestEmpty(t, "GET", loc))
 	require.Equal(t, http.StatusOK, rr2.Code)
@@ -89,7 +90,7 @@ func TestMessage_canDeleteMessageAnd404WhenMessageDoesNotExist(t *testing.T) {
 
 	h, svc := handlerWithDb(t, db)
 
-	id, err := svc.MessagesService.Create(msgs.CreateMessage{Message: "my message"})
+	id, err := svc.MessagesService.Create(msgs.ModifyMessage{Message: "my message"})
 	require.NoError(t, err)
 
 	rr := httptest.NewRecorder()
@@ -99,4 +100,52 @@ func TestMessage_canDeleteMessageAnd404WhenMessageDoesNotExist(t *testing.T) {
 	rr2 := httptest.NewRecorder()
 	h.ServeHTTP(rr2, requestEmpty(t, "GET", uris.Message(id)))
 	require.Equal(t, http.StatusNotFound, rr2.Code)
+}
+
+func TestMessage_canUpdateMessage(t *testing.T) {
+	db, dbClose := acquireDb(t)
+	defer dbClose()
+
+	h, svc := handlerWithDb(t, db)
+
+	id, err := svc.MessagesService.Create(msgs.ModifyMessage{Message: "first message"})
+	require.NoError(t, err)
+
+	// Update the message.
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, requestString(t, "PUT", uris.Message(id), `{"message": "new message"}`))
+	require.Equal(t, http.StatusOK, rr.Code)
+
+	// Then retrieve it.
+	rr2 := httptest.NewRecorder()
+	h.ServeHTTP(rr2, requestEmpty(t, "GET", uris.Message(id)))
+	require.Equal(t, http.StatusOK, rr2.Code)
+	var m messages.MessageResponseJSON
+	require.NoError(t, json.Unmarshal(rr2.Body.Bytes(), &m))
+	require.Equal(t, "new message", m.Message)
+}
+
+func TestMessage_canListMessages(t *testing.T) {
+	db, dbClose := acquireDb(t)
+	defer dbClose()
+
+	h, svc := handlerWithDb(t, db)
+
+	_, err := svc.MessagesService.Create(msgs.ModifyMessage{Message: "first message"})
+	require.NoError(t, err)
+	_, err = svc.MessagesService.Create(msgs.ModifyMessage{Message: "second message"})
+	require.NoError(t, err)
+	_, err = svc.MessagesService.Create(msgs.ModifyMessage{Message: "atttta"})
+	require.NoError(t, err)
+	_, err = svc.MessagesService.Create(msgs.ModifyMessage{Message: "last message"})
+	require.NoError(t, err)
+
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?fields=message,isPalindrome&pageSize=2&pageStartIndex=1"))
+	require.Equal(t, http.StatusOK, rr.Code)
+	expected := fmt.Sprintf(`{"messages":[` +
+		`{"message":"second message","isPalindrome":false},` +
+		`{"message":"atttta","isPalindrome":true}` +
+		"]}\n")
+	require.Equal(t, expected, rr.Body.String())
 }

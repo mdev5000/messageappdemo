@@ -1,4 +1,4 @@
-package server
+package messages
 
 import (
 	"github.com/mdev5000/qlik_message/data"

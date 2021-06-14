@@ -1,11 +1,11 @@
-package server
+package messages
 
 import (
 	"bytes"
-	"github.com/mdev5000/qlik_message/data"
+	"github.com/mdev5000/qlik_message/approot"
 	"github.com/mdev5000/qlik_message/logging"
-	"github.com/mdev5000/qlik_message/messages"
 	"github.com/mdev5000/qlik_message/postgres"
+	"github.com/mdev5000/qlik_message/server"
 	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
@@ -44,7 +44,7 @@ Top:
 }
 
 func noDbHandler(t *testing.T) http.Handler {
-	h, err := Handler(Services{}, Config{LogRequest: false})
+	h, err := server.Handler(server.Services{}, server.Config{LogRequest: false})
 	require.NoError(t, err)
 	return h
 }
@@ -53,16 +53,16 @@ func noDbServe(t *testing.T, w http.ResponseWriter, r *http.Request) {
 	noDbHandler(t).ServeHTTP(w, r)
 }
 
-func handlerWithDb(t *testing.T, db *postgres.DB) (http.Handler, Services) {
+func handlerWithDb(t *testing.T, db *postgres.DB) (http.Handler, *approot.Services) {
 	log := logging.NoLog()
-	messagesRepo := data.NewMessageRepository(db)
-	svc := Services{
-		Log:             log,
-		MessagesService: messages.NewService(log, messagesRepo),
+	svcs := approot.Setup(db, log)
+	svch := server.Services{
+		Log:             svcs.Log,
+		MessagesService: svcs.MessagesService,
 	}
-	h, err := Handler(svc, Config{LogRequest: false})
+	h, err := server.Handler(svch, server.Config{LogRequest: false})
 	require.NoError(t, err)
-	return h, svc
+	return h, svcs
 }
 
 //func serve(t *testing.T, db *postgres.DB, w http.ResponseWriter, r *http.Request) {

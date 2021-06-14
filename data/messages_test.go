@@ -19,7 +19,7 @@ func TestMessageRepository_Create_canCreateNewMessages(t *testing.T) {
 
 	now := NowUTC()
 
-	id, err := mr.Create(CreateMessage{
+	id, err := mr.Create(ModifyMessage{
 		Message:   "my message",
 		CreatedAt: now,
 	})
@@ -40,11 +40,11 @@ func TestMessageRepository_GetById(t *testing.T) {
 
 	// Add more records to make sure it's actually returning the correct one by id
 	var err error
-	_, err = mr.Create(CreateMessage{Message: "first"})
+	_, err = mr.Create(ModifyMessage{Message: "first"})
 	require.NoError(t, err)
-	id, err := mr.Create(CreateMessage{Message: "find this one"})
+	id, err := mr.Create(ModifyMessage{Message: "find this one"})
 	require.NoError(t, err)
-	_, err = mr.Create(CreateMessage{Message: "first"})
+	_, err = mr.Create(ModifyMessage{Message: "first"})
 	require.NoError(t, err)
 
 	var m Message
@@ -59,7 +59,7 @@ func TestMessageRepository_DeleteById_canDeleteMessagesById(t *testing.T) {
 	defer closeDb()
 	mr := tMessageRepository(db)
 
-	id, err := mr.Create(CreateMessage{Message: "my message"})
+	id, err := mr.Create(ModifyMessage{Message: "my message"})
 	require.NoError(t, err)
 
 	require.NoError(t, mr.DeleteById(id))
@@ -75,11 +75,11 @@ func TestMessageRepository_DeleteById_onlyDeletesTheSpecifiedId(t *testing.T) {
 	defer closeDb()
 	mr := tMessageRepository(db)
 
-	id1, err := mr.Create(CreateMessage{Message: "message 1"})
+	id1, err := mr.Create(ModifyMessage{Message: "message 1"})
 	require.NoError(t, err)
-	id2, err := mr.Create(CreateMessage{Message: "message 2"})
+	id2, err := mr.Create(ModifyMessage{Message: "message 2"})
 	require.NoError(t, err)
-	id3, err := mr.Create(CreateMessage{Message: "message 3"})
+	id3, err := mr.Create(ModifyMessage{Message: "message 3"})
 	require.NoError(t, err)
 
 	require.NoError(t, mr.DeleteById(id2))
@@ -114,22 +114,164 @@ func TestMessagesRepository_UpdateById(t *testing.T) {
 	mr := tMessageRepository(db)
 
 	// Add more records to make sure it's actually returning the correct one by id
-	id, err := mr.Create(CreateMessage{Message: "first message"})
+	id, err := mr.Create(ModifyMessage{Message: "first message"})
 	require.NoError(t, err)
 
 	var message Message
 	require.NoError(t, mr.GetById(id, &message))
 
-	v, err := mr.UpdateById(id, Message{Message: "new message"})
+	v, err := mr.UpdateById(id, ModifyMessage{Message: "new message"})
 	require.NoError(t, err)
 
 	var messageChanged Message
 	require.NoError(t, mr.GetById(id, &messageChanged))
 
-	require.Equal(t, message.Version+1, v)
-	require.Equal(t, messageChanged.Version, v)
-	require.Equal(t, messageChanged.Message, "new message")
-	require.True(t, message.UpdatedAt.Before(messageChanged.UpdatedAt))
+	require.Equal(t, message.Version+1, v, "version is not the same as the previous")
+	require.Equal(t, messageChanged.Version, v, "version has been updated")
+	require.Equal(t, messageChanged.Message, "new message", "message is changed")
+	require.True(t, message.UpdatedAt.Before(messageChanged.UpdatedAt), "updated_at has been updated")
 }
 
-// @todo add test for updatebyid when id not found
+func TestMessagesRepository_UpdateById_errorWhenMissing(t *testing.T) {
+	db, closeDb := acquireDb()
+	defer closeDb()
+	mr := tMessageRepository(db)
+
+	_, err := mr.UpdateById(5, ModifyMessage{Message: "new message"})
+
+	require.Equal(t,
+		idMissingError(RepositoryIdentifierMessages, 5),
+		errors.Unwrap(err))
+}
+
+func TestMessagesRepository_UpdateById_whenNoChanges(t *testing.T) {
+	db, closeDb := acquireDb()
+	defer closeDb()
+	mr := tMessageRepository(db)
+
+	_, err := mr.UpdateById(5, ModifyMessage{Message: "new message"})
+
+	require.Equal(t,
+		idMissingError(RepositoryIdentifierMessages, 5),
+		errors.Unwrap(err))
+}
+
+func TestMessagesRepository_GetAllQuery_canGetAllFields(t *testing.T) {
+	db, closeDb := acquireDb()
+	defer closeDb()
+	mr := tMessageRepository(db)
+
+	now := NowUTC()
+	id, err := mr.Create(ModifyMessage{Message: "first", CreatedAt: now})
+	require.NoError(t, err)
+
+	var messages []*Message
+	require.NoError(t, mr.GetAllQuery(MessageQuery{}, &messages))
+
+	require.Len(t, messages, 1)
+	require.Equal(t, id, messages[0].Id)
+	require.Equal(t, "first", messages[0].Message)
+	require.True(t, now.Equal(messages[0].CreatedAt))
+	require.True(t, now.Equal(messages[0].UpdatedAt))
+}
+
+func TestMessagesRepository_GetAllQuery_canLimitQueriedFields(t *testing.T) {
+	db, closeDb := acquireDb()
+	defer closeDb()
+	mr := tMessageRepository(db)
+
+	id, err := mr.Create(ModifyMessage{Message: "a message"})
+	require.NoError(t, err)
+
+	var golden Message
+	require.NoError(t, mr.GetById(id, &golden))
+
+	cases := []struct {
+		name     string
+		fields   []string
+		expected Message
+	}{
+		{name: "id", fields: []string{"id"}, expected: Message{Id: golden.Id}},
+		{name: "version", fields: []string{"version"}, expected: Message{Version: golden.Version}},
+		{name: "createdAt", fields: []string{"createdAt"}, expected: Message{CreatedAt: golden.CreatedAt}},
+		{name: "updatedAt", fields: []string{"updatedAt"}, expected: Message{UpdatedAt: golden.UpdatedAt}},
+		{name: "message", fields: []string{"message"}, expected: Message{Message: golden.Message}},
+		{
+			name:   "version, message",
+			fields: []string{"version", "message"},
+			expected: Message{
+				Version: golden.Version,
+				Message: golden.Message,
+			}},
+		{
+			name:   "version, updatedAt, message",
+			fields: []string{"version", "updatedAt", "message"},
+			expected: Message{
+				Version:   golden.Version,
+				UpdatedAt: golden.UpdatedAt,
+				Message:   golden.Message,
+			}},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			fields := map[string]struct{}{}
+			for _, field := range c.fields {
+				fields[field] = struct{}{}
+			}
+			var messages []*Message
+			require.NoError(t, mr.GetAllQuery(MessageQuery{Fields: fields}, &messages))
+			require.Len(t, messages, 1)
+			require.Equal(t, &c.expected, messages[0])
+		})
+	}
+}
+
+func TestMessagesRepository_getAllQuery(t *testing.T) {
+	db, closeDb := acquireDb()
+	defer closeDb()
+	mr := tMessageRepository(db)
+
+	id1, err := mr.Create(ModifyMessage{Message: "first"})
+	require.NoError(t, err)
+	id2, err := mr.Create(ModifyMessage{Message: "second"})
+	require.NoError(t, err)
+	id3, err := mr.Create(ModifyMessage{Message: "third"})
+	require.NoError(t, err)
+
+	t.Run("can retrieve all records", func(t *testing.T) {
+		q := MessageQuery{Fields: map[string]struct{}{"id": {}}}
+		var messages []*Message
+		require.NoError(t, mr.GetAllQuery(q, &messages))
+
+		require.Len(t, messages, 3)
+		require.Equal(t, id1, messages[0].Id)
+		require.Equal(t, id2, messages[1].Id)
+		require.Equal(t, id3, messages[2].Id)
+
+	})
+
+	t.Run("can limited and offset values", func(t *testing.T) {
+		q := MessageQuery{
+			Fields: map[string]struct{}{"id": {}},
+			Limit:  2,
+			Offset: 1,
+		}
+		var messages []*Message
+		require.NoError(t, mr.GetAllQuery(q, &messages))
+
+		require.Len(t, messages, 2)
+		require.Equal(t, id2, messages[0].Id)
+		require.Equal(t, id3, messages[1].Id)
+	})
+
+	t.Run("bad offset returns empty", func(t *testing.T) {
+		q := MessageQuery{
+			Fields: map[string]struct{}{"id": {}},
+			Offset: 500,
+		}
+		var messages []*Message
+		require.NoError(t, mr.GetAllQuery(q, &messages))
+		require.Len(t, messages, 0)
+	})
+}

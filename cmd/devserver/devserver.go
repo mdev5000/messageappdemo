@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/mdev5000/qlik_message/approot"
 	"github.com/mdev5000/qlik_message/data"
 	"github.com/mdev5000/qlik_message/logging"
-	"github.com/mdev5000/qlik_message/messages"
 	"github.com/mdev5000/qlik_message/postgres"
 	"github.com/mdev5000/qlik_message/server"
 	"net/http"
@@ -27,14 +27,12 @@ func run() error {
 	}
 
 	log := logging.New()
-	messagesRepo := data.NewMessageRepository(db)
+	services := approot.Setup(db, log)
 
-	services := server.Services{
-		Log:             log,
-		MessagesService: messages.NewService(log, messagesRepo),
-	}
-
-	handler, err := server.Handler(services, server.Config{
+	handler, err := server.Handler(server.Services{
+		Log:             services.Log,
+		MessagesService: services.MessagesService,
+	}, server.Config{
 		LogRequest: true,
 	})
 	if err != nil {

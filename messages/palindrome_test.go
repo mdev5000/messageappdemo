@@ -18,6 +18,7 @@ func TestIsPalindrome(t *testing.T) {
 		{"triple letter letter (same)", "bbb", true},
 		{"word: cabac", "cabac", true},
 		{"word: ducks", "ducks", false},
+		{"word: atttta", "atttta", true},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
