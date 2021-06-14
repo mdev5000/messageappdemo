@@ -107,3 +107,29 @@ func TestMessageRepository_DeleteById_returnsErrorWhenNoRowsAreDeleted(t *testin
 	require.EqualError(t, err,
 		"Error [internal] (MessagesRepository.DeleteById): expected delete by id to delete 1 row but 0 were deleted")
 }
+
+func TestMessagesRepository_UpdateById(t *testing.T) {
+	db, closeDb := acquireDb()
+	defer closeDb()
+	mr := tMessageRepository(db)
+
+	// Add more records to make sure it's actually returning the correct one by id
+	id, err := mr.Create(CreateMessage{Message: "first message"})
+	require.NoError(t, err)
+
+	var message Message
+	require.NoError(t, mr.GetById(id, &message))
+
+	v, err := mr.UpdateById(id, Message{Message: "new message"})
+	require.NoError(t, err)
+
+	var messageChanged Message
+	require.NoError(t, mr.GetById(id, &messageChanged))
+
+	require.Equal(t, message.Version+1, v)
+	require.Equal(t, messageChanged.Version, v)
+	require.Equal(t, messageChanged.Message, "new message")
+	require.True(t, message.UpdatedAt.Before(messageChanged.UpdatedAt))
+}
+
+// @todo add test for updatebyid when id not found

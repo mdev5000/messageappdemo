@@ -53,13 +53,11 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Location", uris.ReadMessage(id))
+	w.Header().Set("Location", uris.Message(id))
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (h *Handler) Read(w http.ResponseWriter, r *http.Request) {
-	const op = "MessagesHandler.Read"
-
+func (h *Handler) readIdFromUri(op string, w http.ResponseWriter, r *http.Request) (messages.MessageId, bool) {
 	vars := mux.Vars(r)
 	ids := vars["id"]
 	id, err := strconv.Atoi(ids)
@@ -67,10 +65,20 @@ func (h *Handler) Read(w http.ResponseWriter, r *http.Request) {
 		appErr := apperrors.Error{Op: op}
 		appErr.AddResponse(apperrors.ErrorResponse("invalid message id"))
 		handler.SendErrorResponse(h.log, op, w, &appErr)
+		return 0, false
+	}
+	return messages.MessageId(id), true
+}
+
+func (h *Handler) Read(w http.ResponseWriter, r *http.Request) {
+	const op = "MessagesHandler.Read"
+
+	id, ok := h.readIdFromUri(op, w, r)
+	if !ok {
 		return
 	}
 
-	message, err := h.messagesSvc.Read(int64(id))
+	message, err := h.messagesSvc.Read(id)
 	if err != nil {
 		handler.SendErrorResponse(h.log, op, w, err)
 		return
@@ -90,7 +98,17 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("delete")
+	const op = "MessagesHandler.Delete"
+
+	id, ok := h.readIdFromUri(op, w, r)
+	if !ok {
+		return
+	}
+
+	if err := h.messagesSvc.Delete(id); err != nil {
+		handler.SendErrorResponse(h.log, op, w, err)
+		return
+	}
 }
 
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {

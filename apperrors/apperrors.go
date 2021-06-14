@@ -3,6 +3,8 @@ package apperrors
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
+	"net/http"
 )
 
 type errResponse struct {
@@ -43,6 +45,34 @@ func (e *Error) Is(err error) bool {
 	switch err.(type) {
 	case *Error:
 		return true
+	default:
+		return errors.Is(e.Err, err)
+	}
+}
+
+func StatusCode(err error) int {
+	switch e := err.(type) {
+	case *Error:
+		switch e.EType {
+		case ETInvalid:
+			return http.StatusBadRequest
+		case ETNotFound:
+			return http.StatusNotFound
+		default:
+			return http.StatusInternalServerError
+		}
+	default:
+		return http.StatusInternalServerError
+	}
+}
+
+func HasResponse(err error) bool {
+	switch e := err.(type) {
+	case *Error:
+		switch e.EType {
+		case ETInvalid:
+			return len(e.Responses) > 0
+		}
 	}
 	return false
 }

@@ -2,11 +2,15 @@ package data
 
 import (
 	"fmt"
+	sq "github.com/Masterminds/squirrel"
 	"github.com/mdev5000/qlik_message/postgres"
+	"github.com/pkg/errors"
 	"time"
 )
 
 const RepositoryIdentifierMessages = "messages"
+
+var NoChangesInUpdateError = errors.New("no changes made in update call")
 
 type MessageId = int64
 type MessageVersion = int
@@ -94,4 +98,36 @@ func (mr *MessagesRepository) GetById(id MessageId, m *Message) error {
 		return err
 	}
 	return nil
+}
+
+func (mr *MessagesRepository) UpdateById(id MessageId, m Message) (MessageVersion, error) {
+	const op = repoName + ".UpdateById"
+	q := sq.Update("messages").
+		PlaceholderFormat(sq.Dollar).
+		Set("version", sq.Expr("version + 1")).
+		Set("updated_at", NowUTC()).
+		Where(sq.Eq{"id": id})
+
+	hasSetField := false
+	if m.Message != "" {
+		hasSetField = true
+		q = q.Set("message", m.Message)
+	}
+	// No changes actually made, so don't do anything.
+	if !hasSetField {
+		return 0, repoError2(op, NoChangesInUpdateError)
+	}
+	sql, args, err := q.ToSql()
+	if err != nil {
+		return 0, repoError(op, fmt.Errorf("failed to generate update query: %w", err), err)
+	}
+	row := mr.db.QueryRow(sql+" returning version", args...)
+	if err := row.Err(); err != nil {
+		return 0, repoError(op, fmt.Errorf("failed to update row: %w", err), err)
+	}
+	var version MessageVersion
+	if err := row.Scan(&version); err != nil {
+		return 0, repoError(op, fmt.Errorf("failed to scan version number: %w", err), err)
+	}
+	return version, nil
 }

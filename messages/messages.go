@@ -4,6 +4,7 @@ import (
 	"github.com/mdev5000/qlik_message/apperrors"
 	"github.com/mdev5000/qlik_message/data"
 	"github.com/mdev5000/qlik_message/logging"
+	"github.com/pkg/errors"
 )
 
 const InvalidMessageId = 0
@@ -54,7 +55,15 @@ func (ms *Service) Create(message CreateMessage) (MessageId, error) {
 }
 
 func (ms *Service) Read(id MessageId) (*Message, error) {
+	const op = "MessagesService.Read"
 	var message Message
 	err := ms.repo.GetById(id, &message)
+	if errors.Is(err, data.IdMissingError{}) {
+		return nil, &apperrors.Error{Op: op, EType: apperrors.ETNotFound, Err: err}
+	}
 	return &message, err
+}
+
+func (ms *Service) Delete(id MessageId) error {
+	return ms.repo.DeleteById(id)
 }

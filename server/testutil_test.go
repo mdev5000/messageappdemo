@@ -53,15 +53,16 @@ func noDbServe(t *testing.T, w http.ResponseWriter, r *http.Request) {
 	noDbHandler(t).ServeHTTP(w, r)
 }
 
-func handlerWithDb(t *testing.T, db *postgres.DB) http.Handler {
+func handlerWithDb(t *testing.T, db *postgres.DB) (http.Handler, Services) {
 	log := logging.NoLog()
 	messagesRepo := data.NewMessageRepository(db)
-	h, err := Handler(Services{
+	svc := Services{
 		Log:             log,
 		MessagesService: messages.NewService(log, messagesRepo),
-	}, Config{LogRequest: false})
+	}
+	h, err := Handler(svc, Config{LogRequest: false})
 	require.NoError(t, err)
-	return h
+	return h, svc
 }
 
 //func serve(t *testing.T, db *postgres.DB, w http.ResponseWriter, r *http.Request) {

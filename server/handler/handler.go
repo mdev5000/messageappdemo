@@ -28,7 +28,12 @@ func SendErrorResponse(log *logging.Logger, op string, w http.ResponseWriter, er
 		return
 	}
 
-	w.WriteHeader(http.StatusBadRequest)
+	code := apperrors.StatusCode(err)
+	w.WriteHeader(code)
+	if !apperrors.HasResponse(err) {
+		return
+	}
+
 	enc := json.NewEncoder(w)
 	if jsonErr := apperrors.ToJSON(enc, err); jsonErr != nil {
 		log.LogFailedToEncode(op, err, jsonErr, errors.WithStack(jsonErr))
