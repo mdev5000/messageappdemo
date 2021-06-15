@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+	"github.com/mdev5000/qlik_message/messages"
 	"github.com/mdev5000/qlik_message/postgres"
 	"github.com/stretchr/testify/require"
 	"sort"
@@ -19,7 +20,7 @@ func TestMessageRepository_Create_canCreateNewMessages(t *testing.T) {
 
 	now := NowUTC()
 
-	id, err := mr.Create(ModifyMessage{
+	id, err := mr.Create(CreateMessage{
 		Message:   "my message",
 		CreatedAt: now,
 	})
@@ -40,11 +41,11 @@ func TestMessageRepository_GetById(t *testing.T) {
 
 	// Add more records to make sure it's actually returning the correct one by id
 	var err error
-	_, err = mr.Create(ModifyMessage{Message: "first"})
+	_, err = mr.Create(CreateMessage{Message: "first"})
 	require.NoError(t, err)
-	id, err := mr.Create(ModifyMessage{Message: "find this one"})
+	id, err := mr.Create(CreateMessage{Message: "find this one"})
 	require.NoError(t, err)
-	_, err = mr.Create(ModifyMessage{Message: "first"})
+	_, err = mr.Create(CreateMessage{Message: "first"})
 	require.NoError(t, err)
 
 	var m Message
@@ -59,15 +60,15 @@ func TestMessageRepository_DeleteById_canDeleteMessagesById(t *testing.T) {
 	defer closeDb()
 	mr := tMessageRepository(db)
 
-	id, err := mr.Create(ModifyMessage{Message: "my message"})
+	id, err := mr.Create(CreateMessage{Message: "my message"})
 	require.NoError(t, err)
 
 	require.NoError(t, mr.DeleteById(id))
 
 	var m Message
 	err = mr.GetById(id, &m)
-	require.True(t, errors.Is(err, IdMissingError{}))
-	require.Error(t, err, "messages repository: no rows in result for get by id with id %d", id)
+	require.True(t, errors.Is(err, messages.IdMissingError{}))
+	require.Error(t, err, "MessagesRepository.DeleteById: no rows in result for get by id with id %d", id)
 }
 
 func TestMessageRepository_DeleteById_onlyDeletesTheSpecifiedId(t *testing.T) {
@@ -75,11 +76,11 @@ func TestMessageRepository_DeleteById_onlyDeletesTheSpecifiedId(t *testing.T) {
 	defer closeDb()
 	mr := tMessageRepository(db)
 
-	id1, err := mr.Create(ModifyMessage{Message: "message 1"})
+	id1, err := mr.Create(CreateMessage{Message: "message 1"})
 	require.NoError(t, err)
-	id2, err := mr.Create(ModifyMessage{Message: "message 2"})
+	id2, err := mr.Create(CreateMessage{Message: "message 2"})
 	require.NoError(t, err)
-	id3, err := mr.Create(ModifyMessage{Message: "message 3"})
+	id3, err := mr.Create(CreateMessage{Message: "message 3"})
 	require.NoError(t, err)
 
 	require.NoError(t, mr.DeleteById(id2))
@@ -114,7 +115,7 @@ func TestMessagesRepository_UpdateById(t *testing.T) {
 	mr := tMessageRepository(db)
 
 	// Add more records to make sure it's actually returning the correct one by id
-	id, err := mr.Create(ModifyMessage{Message: "first message"})
+	id, err := mr.Create(CreateMessage{Message: "first message"})
 	require.NoError(t, err)
 
 	var message Message
@@ -140,7 +141,7 @@ func TestMessagesRepository_UpdateById_errorWhenMissing(t *testing.T) {
 	_, err := mr.UpdateById(5, ModifyMessage{Message: "new message"})
 
 	require.Equal(t,
-		idMissingError(RepositoryIdentifierMessages, 5),
+		idMissingError("MessagesRepository.UpdateById", 5),
 		errors.Unwrap(err))
 }
 
@@ -152,7 +153,7 @@ func TestMessagesRepository_UpdateById_whenNoChanges(t *testing.T) {
 	_, err := mr.UpdateById(5, ModifyMessage{Message: "new message"})
 
 	require.Equal(t,
-		idMissingError(RepositoryIdentifierMessages, 5),
+		idMissingError("MessagesRepository.UpdateById", 5),
 		errors.Unwrap(err))
 }
 
@@ -162,7 +163,7 @@ func TestMessagesRepository_GetAllQuery_canGetAllFields(t *testing.T) {
 	mr := tMessageRepository(db)
 
 	now := NowUTC()
-	id, err := mr.Create(ModifyMessage{Message: "first", CreatedAt: now})
+	id, err := mr.Create(CreateMessage{Message: "first", CreatedAt: now})
 	require.NoError(t, err)
 
 	var messages []*Message
@@ -180,7 +181,7 @@ func TestMessagesRepository_GetAllQuery_canLimitQueriedFields(t *testing.T) {
 	defer closeDb()
 	mr := tMessageRepository(db)
 
-	id, err := mr.Create(ModifyMessage{Message: "a message"})
+	id, err := mr.Create(CreateMessage{Message: "a message"})
 	require.NoError(t, err)
 
 	var golden Message
@@ -232,11 +233,11 @@ func TestMessagesRepository_getAllQuery(t *testing.T) {
 	defer closeDb()
 	mr := tMessageRepository(db)
 
-	id1, err := mr.Create(ModifyMessage{Message: "first"})
+	id1, err := mr.Create(CreateMessage{Message: "first"})
 	require.NoError(t, err)
-	id2, err := mr.Create(ModifyMessage{Message: "second"})
+	id2, err := mr.Create(CreateMessage{Message: "second"})
 	require.NoError(t, err)
-	id3, err := mr.Create(ModifyMessage{Message: "third"})
+	id3, err := mr.Create(CreateMessage{Message: "third"})
 	require.NoError(t, err)
 
 	t.Run("can retrieve all records", func(t *testing.T) {

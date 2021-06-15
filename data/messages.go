@@ -5,30 +5,17 @@ import (
 	"errors"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/mdev5000/qlik_message/messages"
 	"github.com/mdev5000/qlik_message/postgres"
 	"strings"
-	"time"
 )
 
-const RepositoryIdentifierMessages = "messages"
-
-type MessageId = int64
-type MessageVersion = int
-
-type Message struct {
-	Id        MessageId      `db:"id"`
-	Version   MessageVersion `db:"version"`
-	CreatedAt time.Time      `db:"created_at"`
-	UpdatedAt time.Time      `db:"updated_at"`
-	Message   string         `db:"message"`
-}
-
-type ModifyMessage struct {
-	Message string `db:"message"`
-
-	// CreatedAt is only used for creation of a message and will be ignored for update operations.
-	CreatedAt time.Time `db:"created_at"`
-}
+type MessageId = messages.MessageId
+type MessageVersion = messages.MessageVersion
+type Message = messages.Message
+type CreateMessage = messages.CreateMessage
+type ModifyMessage = messages.ModifyMessage
+type MessageQuery = messages.MessageQuery
 
 type MessagesRepository struct {
 	db *postgres.DB
@@ -42,11 +29,11 @@ const repoName = "MessagesRepository"
 
 // Map of fields the user is allowed to query in format {field: table_col}
 var queryableFields = map[string]string{
-	"id":        "id",
-	"version":   "version",
-	"createdAt": "created_at",
-	"updatedAt": "updated_at",
-	"message":   "message",
+	messages.FieldId:        "id",
+	messages.FieldVersion:   "version",
+	messages.FieldCreatedAt: "created_at",
+	messages.FieldUpdatedAt: "updated_at",
+	messages.FieldMessage:   "message",
 }
 
 func (mr *MessagesRepository) DeleteById(id MessageId) error {
@@ -66,7 +53,7 @@ func (mr *MessagesRepository) DeleteById(id MessageId) error {
 }
 
 // Create creates a new message. Note that CreatedAt should be in the UTC-0 timezone.
-func (mr *MessagesRepository) Create(cm ModifyMessage) (MessageId, error) {
+func (mr *MessagesRepository) Create(cm CreateMessage) (MessageId, error) {
 	const op = repoName + ".Create"
 	rows, err := mr.db.Query(
 		`
@@ -103,12 +90,6 @@ func (mr *MessagesRepository) GetAll(messages *[]*Message) error {
 		return repoError(op, fmt.Errorf("failed to get messages: %w", err), err)
 	}
 	return nil
-}
-
-type MessageQuery struct {
-	Fields map[string]struct{}
-	Limit  uint64
-	Offset uint64
 }
 
 func (mr *MessagesRepository) GetAllQuery(query MessageQuery, messages *[]*Message) error {
@@ -159,7 +140,7 @@ func (mr *MessagesRepository) GetById(id MessageId, m *Message) error {
 	const op = repoName + ".GetById"
 	if err := mr.db.Get(m, `select id, version, created_at, updated_at, message from messages where id=$1`, id); err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return repoError2(op, idMissingError(RepositoryIdentifierMessages, id))
+			return repoError2(op, idMissingError(op, id))
 		}
 		return err
 	}
@@ -190,7 +171,7 @@ func (mr *MessagesRepository) UpdateById(id MessageId, m ModifyMessage) (Message
 	var version MessageVersion
 	if err := row.Scan(&version); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return 0, repoError2(op, idMissingError(RepositoryIdentifierMessages, id))
+			return 0, repoError2(op, idMissingError(op, id))
 		}
 		return 0, repoError(op, fmt.Errorf("failed to scan version number: %w", err), err)
 	}

@@ -9,31 +9,7 @@ import (
 	"github.com/mdev5000/qlik_message/server/uris"
 	"net/http"
 	"strconv"
-	"time"
 )
-
-type modifyMessageJSON struct {
-	Message string `json:"message"`
-}
-
-func (m *modifyMessageJSON) toModifyMessage() messages.ModifyMessage {
-	return messages.ModifyMessage{
-		Message: m.Message,
-	}
-}
-
-type MessageListResponseJSON struct {
-	Messages []MessageResponseJSON `json:"messages,omitempty"`
-}
-
-type MessageResponseJSON struct {
-	Id           *messages.MessageId      `json:"id,omitempty"`
-	Version      *messages.MessageVersion `json:"version,omitempty"`
-	CreatedAt    *time.Time               `json:"created_at,omitempty"`
-	UpdatedAt    *time.Time               `json:"updated_at,omitempty"`
-	Message      string                   `json:"message,omitempty"`
-	IsPalindrome bool                     `json:"isPalindrome"`
-}
 
 type Handler struct {
 	log         *logging.Logger
@@ -126,7 +102,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msgs, err := h.messagesSvc.List(messages.MessageQuery{
-		Fields: fields,
+		Fields: filterDynamicFields(fields),
 		Limit:  limit,
 		Offset: offset,
 	})
@@ -137,7 +113,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 
 	out := make([]MessageResponseJSON, len(msgs))
 	for i, msg := range msgs {
-		out[i] = messageToJsonValue(msg)
+		out[i] = queryMessageToJsonValue(msg, fields)
 	}
 
 	handler.EncodeJsonOrError(op, h.log, w, MessageListResponseJSON{Messages: out})
@@ -154,25 +130,4 @@ func (h *Handler) readIdFromUri(op string, w http.ResponseWriter, r *http.Reques
 		return 0, false
 	}
 	return messages.MessageId(id), true
-}
-
-func messageToJsonValue(message *messages.Message) MessageResponseJSON {
-	emptyTime := time.Time{}
-	mr := MessageResponseJSON{
-		Message:      message.Message,
-		IsPalindrome: message.IsPalindrome,
-	}
-	if message.Id != 0 {
-		mr.Id = &message.Id
-	}
-	if message.Version != 0 {
-		mr.Version = &message.Version
-	}
-	if !emptyTime.Equal(message.CreatedAt) {
-		mr.CreatedAt = &message.CreatedAt
-	}
-	if !emptyTime.Equal(message.UpdatedAt) {
-		mr.UpdatedAt = &message.UpdatedAt
-	}
-	return mr
 }

@@ -1,31 +1,13 @@
 package data
 
 import (
-	"fmt"
 	"github.com/mdev5000/qlik_message/apperrors"
+	"github.com/mdev5000/qlik_message/messages"
 	"github.com/pkg/errors"
 )
 
-func idMissingError(repo string, id int64) error {
-	return IdMissingError{RepositoryIdentifier: repo, Id: id}
-}
-
-type IdMissingError struct {
-	RepositoryIdentifier string
-	Id                   int64
-}
-
-func (e IdMissingError) Error() string {
-	return fmt.Sprintf("%s repository: no rows in result for get by id with id %d", e.RepositoryIdentifier, e.Id)
-}
-
-func (e IdMissingError) Is(target error) bool {
-	switch target.(type) {
-	case IdMissingError:
-		return true
-	default:
-		return false
-	}
+func idMissingError(op string, id int64) error {
+	return messages.IdMissingError{Op: op, Id: id}
 }
 
 func repoError2(op string, err error) error {
