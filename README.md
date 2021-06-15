@@ -66,6 +66,8 @@ go vet ./...
 
 ## Update API documentation
 
-### Prerequisites
+To update the API documentation after changing the `/_openapi/messages.json` file, run the following:
 
-You must have `openapi-generator` installed, see https://openapi-generator.tech/docs/installation/ for details.
+```bash
+make docs.api.gen
+```

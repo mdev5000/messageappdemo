@@ -155,7 +155,7 @@ func TestMessage_canListMessages(t *testing.T) {
 
 	h, svc := handlerWithDb(t, db)
 
-	_, err := svc.MessagesService.Create(msgs.ModifyMessage{Message: "first message"})
+	id1, err := svc.MessagesService.Create(msgs.ModifyMessage{Message: "first message"})
 	require.NoError(t, err)
 	_, err = svc.MessagesService.Create(msgs.ModifyMessage{Message: "second message"})
 	require.NoError(t, err)
@@ -164,20 +164,57 @@ func TestMessage_canListMessages(t *testing.T) {
 	_, err = svc.MessagesService.Create(msgs.ModifyMessage{Message: "last message"})
 	require.NoError(t, err)
 
-	rr := httptest.NewRecorder()
-	h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?fields=message,isPalindrome&pageSize=2&pageStartIndex=1"))
-	requireJsonOk(t, rr)
-	expected := fmt.Sprintf(`{"messages":[` +
-		`{"message":"atttta","isPalindrome":true},` +
-		`{"message":"last message","isPalindrome":false}` +
-		"]}\n")
-	require.Equal(t, expected, rr.Body.String())
+	t.Run("with fields, pageSize, and pageStartIndex", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?fields=message,isPalindrome&pageSize=2&pageStartIndex=1"))
+		requireJsonOk(t, rr)
+		expected := fmt.Sprintf(`{"messages":[` +
+			`{"message":"atttta","isPalindrome":true},` +
+			`{"message":"last message","isPalindrome":false}` +
+			"]}\n")
+		require.Equal(t, expected, rr.Body.String())
+	})
+
+	t.Run("show all fields when non specified in query", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?pageSize=1"))
+		requireJsonOk(t, rr)
+		var data messages.MessageListResponseJSON
+		require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &data))
+		require.Len(t, data.Messages, 1)
+		require.Equal(t, id1, data.Messages[0].Id)
+		require.Equal(t, 1, data.Messages[0].Version)
+		require.NotNil(t, data.Messages[0].CreatedAt)
+		require.NotNil(t, data.Messages[0].UpdatedAt)
+		require.Equal(t, "first message", data.Messages[0].Message)
+	})
 }
 
-// @todo test when no fields specified shows all fields.
-// @todo shows error when invalid field name.
-// @todo shows error when pageLimit invalid.
-// @todo shows error when pageStartIndex invalid.
+func TestMessage_whenListingMessages_errors(t *testing.T) {
+	db, dbClose := acquireDb(t)
+	defer dbClose()
+
+	t.Run("error when invalid field name", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		serve(t, db, rr, requestEmpty(t, "GET", "/messages?fields=id,notAField,version"))
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+		require.Equal(t, "{\"errors\":[{\"error\":\"invalid messages fields: notAField\"}]}\n", rr.Body.String())
+	})
+
+	t.Run("error when invalid page limit", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		serve(t, db, rr, requestEmpty(t, "GET", "/messages?pageSize=badSize"))
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+		require.Equal(t, "{\"errors\":[\"invalid pageSize value\"]}\n", rr.Body.String())
+	})
+
+	t.Run("error when invalid page start index", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		serve(t, db, rr, requestEmpty(t, "GET", "/messages?pageStartIndex=badIndex"))
+		require.Equal(t, http.StatusBadRequest, rr.Code)
+		require.Equal(t, "{\"errors\":[\"invalid pageStartIndex value\"]}\n", rr.Body.String())
+	})
+}
 
 func requireJsonOk(t *testing.T, rr *httptest.ResponseRecorder) {
 	require.Equal(t, http.StatusOK, rr.Code)

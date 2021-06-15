@@ -65,9 +65,10 @@ func handlerWithDb(t *testing.T, db *postgres.DB) (http.Handler, *approot.Servic
 	return h, svcs
 }
 
-//func serve(t *testing.T, db *postgres.DB, w http.ResponseWriter, r *http.Request) {
-//	handlerWithDb(t, db).ServeHTTP(w, r)
-//}
+func serve(t *testing.T, db *postgres.DB, w http.ResponseWriter, r *http.Request) {
+	h, _ := handlerWithDb(t, db)
+	h.ServeHTTP(w, r)
+}
 
 func requestEmpty(t *testing.T, method, url string) *http.Request {
 	return request(t, method, url, nil)
