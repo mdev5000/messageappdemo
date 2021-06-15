@@ -5,9 +5,12 @@ import (
 	"errors"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
+	"github.com/mdev5000/qlik_message/apperrors"
 	"github.com/mdev5000/qlik_message/messages"
 	"github.com/mdev5000/qlik_message/postgres"
+	errors2 "github.com/pkg/errors"
 	"strings"
+	"time"
 )
 
 type MessageId = messages.MessageId
@@ -113,7 +116,15 @@ func (mr *MessagesRepository) GetAllQuery(query MessageQuery, messages *[]*Messa
 			}
 		}
 		if len(notFound) != 0 {
-			return repoError2(op, fmt.Errorf("invalid messages fields: %s", strings.Join(notFound, ",")))
+			err := fmt.Errorf("invalid messages fields: %s", strings.Join(notFound, ", "))
+			aErr := apperrors.Error{
+				EType: apperrors.ETInvalid,
+				Op:    op,
+				Err:   err,
+				Stack: errors2.WithStack(err),
+			}
+			aErr.AddResponse(apperrors.ErrorResponse(err.Error()))
+			return &aErr
 		}
 	}
 
@@ -153,7 +164,7 @@ func (mr *MessagesRepository) UpdateById(id MessageId, m ModifyMessage) (Message
 	q := sq.Update("messages").
 		PlaceholderFormat(sq.Dollar).
 		Set("version", sq.Expr("version + 1")).
-		Set("updated_at", NowUTC()).
+		Set("updated_at", nowUTC()).
 		Where(sq.Eq{"id": id})
 
 	q = q.Set("message", m.Message)
@@ -176,4 +187,12 @@ func (mr *MessagesRepository) UpdateById(id MessageId, m ModifyMessage) (Message
 		return 0, repoError(op, fmt.Errorf("failed to scan version number: %w", err), err)
 	}
 	return version, nil
+}
+
+func nowUTC() time.Time {
+	loc, err := time.LoadLocation("UTC")
+	if err != nil {
+		panic(fmt.Errorf("failed to load UTC timezone: %w", err))
+	}
+	return time.Now().In(loc).Round(time.Millisecond)
 }

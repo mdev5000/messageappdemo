@@ -16,6 +16,14 @@ const (
 	FieldUpdatedAt = "updatedAt"
 )
 
+var AllFields = map[string]struct{}{
+	FieldId:        {},
+	FieldVersion:   {},
+	FieldMessage:   {},
+	FieldCreatedAt: {},
+	FieldUpdatedAt: {},
+}
+
 type CreateMessage struct {
 	Message string `db:"message"`
 

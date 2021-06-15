@@ -7,7 +7,7 @@ import (
 )
 
 // GetQueryParams extracts common query parameters that are used for filtering the results contained with a REST store.
-// Ex. ?fields=only,some&pageSize=20&pageStartIndex=10 = fields=[]string{only,some}, limit=20, offset=10
+// Ex. ?fields=only,some&pageSize=20&pageStartIndex=10 = fields=[]string{only,some}, limit=20, offset=200
 func GetQueryParams(op string, r *http.Request) (fields map[string]struct{}, limit uint64, offset uint64, err error) {
 	fields = map[string]struct{}{}
 
@@ -22,12 +22,17 @@ func GetQueryParams(op string, r *http.Request) (fields map[string]struct{}, lim
 	}
 
 	if offsetS := r.URL.Query().Get("pageStartIndex"); offsetS != "" {
-		offset, err = strconv.ParseUint(offsetS, 10, 64)
-		if err != nil {
+		pageOffset, errPO := strconv.ParseUint(offsetS, 10, 64)
+		if errPO != nil {
 			re := ResponseError(op)
 			re.AddResponse("invalid pageStartIndex value")
 			err = &re
 			return
+		}
+		if limit == 0 {
+			offset = pageOffset
+		} else {
+			offset = pageOffset * limit
 		}
 	}
 

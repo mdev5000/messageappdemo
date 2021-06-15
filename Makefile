@@ -70,14 +70,26 @@ cover.report:
 
 
 
-# DEV
+# DEPENDENCIES
 # -------------------------------------------------------
 
-# This should be run prior to any commits, runs the various tools that should pass before committing code.
-dev.run:
-	docker-compose up -d
+# Generate the API documentation using openapi.
+docs.api.gen:
+	@rm -rf _docs/api
 
+	docker run --rm \
+      -u $$(id -u ${USER}):$$(id -g ${USER}) \
+      -v ${PWD}:/local openapitools/openapi-generator-cli generate \
+      -i /local/_openapi/messages.json \
+      -g markdown \
+      -o /local/_docs/api
 
+	docker run --rm \
+      -u $$(id -u ${USER}):$$(id -g ${USER}) \
+      -v ${PWD}:/local openapitools/openapi-generator-cli generate \
+      -i /local/_openapi/messages.json \
+      -g html2 \
+      -o /local/_docs/api/html
 
 # MISC
 # -------------------------------------------------------

@@ -8,7 +8,6 @@ import (
 	"testing"
 )
 
-var runDbTests bool
 var pool *dbpool.DbPool
 
 // Acquire a database instance. You must call close you are finished with the database.  This functions currently
@@ -37,7 +36,6 @@ func TestMain(m *testing.M) {
 		return
 	}
 
-	runDbTests = true
 	pool = dbpool.NewDbPool()
 	pool.SetupSchema = SetupSchema
 	pool.PurgeDb = PurgeDb

@@ -61,3 +61,11 @@ ok  	github.com/mdev5000/qlik_message/data	(cached)	coverage: 80.5% of statement
 staticcheck ./...
 go vet ./...
 ```
+
+---
+
+## Update API documentation
+
+### Prerequisites
+
+You must have `openapi-generator` installed, see https://openapi-generator.tech/docs/installation/ for details.

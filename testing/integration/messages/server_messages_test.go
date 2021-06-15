@@ -1,9 +1,11 @@
 package messages
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	msgs "github.com/mdev5000/qlik_message/messages"
+	"github.com/mdev5000/qlik_message/server/handler"
 	"github.com/mdev5000/qlik_message/server/messages"
 	"github.com/mdev5000/qlik_message/server/uris"
 	"github.com/stretchr/testify/require"
@@ -34,11 +36,11 @@ func TestMessages_canListOptions(t *testing.T) {
 	require.Equal(t, "Allow: GET, POST", rr.Body.String())
 }
 
-func TestMessages_canCreateAMessage(t *testing.T) {
+func TestMessages_canCreateAndGetAMessage(t *testing.T) {
 	db, dbClose := acquireDb(t)
 	defer dbClose()
 
-	h, _ := handlerWithDb(t, db)
+	h, svc := handlerWithDb(t, db)
 
 	// Create the message.
 	rr := httptest.NewRecorder()
@@ -47,13 +49,34 @@ func TestMessages_canCreateAMessage(t *testing.T) {
 	loc := rr.Header().Get("Location")
 	require.True(t, regexp.MustCompile("^/messages/[0-9]+$").MatchString(loc))
 
+	id := messageIdFromLocation(t, loc)
+	msg, err := svc.MessagesService.Read(id)
+	require.NoError(t, err)
+
 	// Then retrieve it.
 	rr2 := httptest.NewRecorder()
 	h.ServeHTTP(rr2, requestEmpty(t, "GET", loc))
-	require.Equal(t, http.StatusOK, rr2.Code)
+	requireJsonOk(t, rr2)
 	var m messages.MessageResponseJSON
 	require.NoError(t, json.Unmarshal(rr2.Body.Bytes(), &m))
+
+	// Check the json.
+	require.Equal(t, msg.Id, m.Id)
+	require.Equal(t, msg.Version, m.Version)
 	require.Equal(t, "my message", m.Message)
+	require.True(t, msg.CreatedAt.Equal(*m.CreatedAt))
+	require.True(t, msg.UpdatedAt.Equal(*m.UpdatedAt))
+
+	// Check the headers.
+	require.Equal(t, handler.LastModifiedFormat(msg.UpdatedAt), rr2.Header().Get("Last-Modified"))
+	require.Equal(t, `"1"`, rr2.Header().Get("ETag"))
+}
+
+func messageIdFromLocation(t *testing.T, uri string) msgs.MessageId {
+	var id msgs.MessageId
+	_, err := fmt.Fscanf(bytes.NewBufferString(uri), "/messages/%d", &id)
+	require.NoError(t, err)
+	return id
 }
 
 func TestMessages_returnsErrorWhen(t *testing.T) {
@@ -79,6 +102,7 @@ func TestMessages_returnsErrorWhen(t *testing.T) {
 			rr := httptest.NewRecorder()
 			noDbServe(t, rr, requestString(t, "POST", "/messages", c.rq))
 			require.Equal(t, http.StatusBadRequest, rr.Code)
+			requireJson(t, rr)
 			require.Equal(t, c.rs, rr.Body.String())
 		})
 	}
@@ -142,10 +166,24 @@ func TestMessage_canListMessages(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?fields=message,isPalindrome&pageSize=2&pageStartIndex=1"))
-	require.Equal(t, http.StatusOK, rr.Code)
+	requireJsonOk(t, rr)
 	expected := fmt.Sprintf(`{"messages":[` +
-		`{"message":"second message","isPalindrome":false},` +
-		`{"message":"atttta","isPalindrome":true}` +
+		`{"message":"atttta","isPalindrome":true},` +
+		`{"message":"last message","isPalindrome":false}` +
 		"]}\n")
 	require.Equal(t, expected, rr.Body.String())
+}
+
+// @todo test when no fields specified shows all fields.
+// @todo shows error when invalid field name.
+// @todo shows error when pageLimit invalid.
+// @todo shows error when pageStartIndex invalid.
+
+func requireJsonOk(t *testing.T, rr *httptest.ResponseRecorder) {
+	require.Equal(t, http.StatusOK, rr.Code)
+	requireJson(t, rr)
+}
+
+func requireJson(t *testing.T, rr *httptest.ResponseRecorder) {
+	require.Equal(t, "application/json", rr.Header().Get("Content-Type"))
 }

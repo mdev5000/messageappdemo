@@ -18,7 +18,7 @@ func TestMessageRepository_Create_canCreateNewMessages(t *testing.T) {
 	defer closeDb()
 	mr := tMessageRepository(db)
 
-	now := NowUTC()
+	now := nowUTC()
 
 	id, err := mr.Create(CreateMessage{
 		Message:   "my message",
@@ -162,7 +162,7 @@ func TestMessagesRepository_GetAllQuery_canGetAllFields(t *testing.T) {
 	defer closeDb()
 	mr := tMessageRepository(db)
 
-	now := NowUTC()
+	now := nowUTC()
 	id, err := mr.Create(CreateMessage{Message: "first", CreatedAt: now})
 	require.NoError(t, err)
 

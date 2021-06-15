@@ -1,0 +1,161 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Title",
+    "description": "Title",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000"
+    }
+  ],
+  "paths": {
+    "/messages": {
+      "summary": "Create or view all messages.",
+      "post": {
+        "description": "Create a new message.",
+        "tags": [
+          "Message"
+        ],
+        "responses": {
+          "201": {
+            "headers": {
+              "Location": {
+                "description": "Path to the newly created message",
+                "example": "/messages/2"
+              }
+            },
+            "description": "Indicates the message was created successfully."
+          }
+        }
+      },
+      "get": {
+        "description": "List all or a subset of existing messages",
+        "responses": {
+          "200": {
+            "description": "Returned when the request succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelectedMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages/{id}": {
+      "summary": "Read, update, or delete a message.",
+      "get": {
+        "tags": [
+          "Message"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Message Id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "headers": {
+              "Last-Modified": {
+                "description": "Returns the datetime the message was last updated."
+              },
+              "ETag": {
+                "description": "Returns the current version number for the message."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Message": {
+        "description": "Contains information on a specific message posted",
+        "type": "object",
+        "required": [
+          "id",
+          "message",
+          "version",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "description": "The message identifier",
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "description": "The message text posted",
+            "type": "string",
+            "format": "string"
+          },
+          "version": {
+            "description": "Version number for the message.",
+            "type": "integer"
+          },
+          "createdAt": {
+            "description": "Time the message was first created",
+            "type": "string",
+            "format": "timestamp"
+          },
+          "updatedAt": {
+            "description": "Time the message was last updated",
+            "type": "string",
+            "format": "timestamp"
+          }
+        }
+      },
+      "SelectedMessage": {
+        "description": "Contains information on a specific message posted",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "The message identifier",
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "description": "The message text posted",
+            "type": "string",
+            "format": "string"
+          },
+          "version": {
+            "description": "Version number for the message.",
+            "type": "integer"
+          },
+          "createdAt": {
+            "description": "Time the message was first created",
+            "type": "string",
+            "format": "timestamp"
+          },
+          "updatedAt": {
+            "description": "Time the message was last updated",
+            "type": "string",
+            "format": "timestamp"
+          }
+        }
+      }
+    }
+  }
+}

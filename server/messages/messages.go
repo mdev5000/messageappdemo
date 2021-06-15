@@ -55,6 +55,8 @@ func (h *Handler) Read(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	handler.SetETagInt(w, message.Version)
+	handler.SetLastModified(w, message.UpdatedAt)
 	handler.EncodeJsonOrError(op, h.log, w, messageToJsonValue(message))
 }
 
@@ -99,6 +101,10 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		handler.SendErrorResponse(h.log, op, w, err)
 		return
+	}
+
+	if len(fields) == 0 {
+		fields = messages.AllFields
 	}
 
 	msgs, err := h.messagesSvc.List(messages.MessageQuery{

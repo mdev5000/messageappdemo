@@ -1,3 +1,5 @@
+// Package dbpool
+// A utility package for running database tests.
 package dbpool
 
 import (
@@ -65,6 +67,7 @@ func (d *DbPool) Setup() error {
 	return nil
 }
 
+// Close removes any docker resources started up for testing.
 func (d *DbPool) Close(errIsFatal bool) {
 	if err := d.pool.Purge(d.resource); err != nil {
 		if errIsFatal {
