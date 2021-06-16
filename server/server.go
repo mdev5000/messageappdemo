@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/negroni"
 	"net/http"
+	"sort"
 	"strings"
 )
 
@@ -48,14 +49,14 @@ func Handler(svc Services, cfg Config) (http.Handler, error) {
 	messageHandler := msgh.NewHandler(svc.Log, svc.MessagesService)
 	messages := mux.PathPrefix("/messages").Subrouter()
 	messages.HandleFunc("", messageHandler.Create).Methods("POST")
-	messages.HandleFunc("", messageHandler.List).Methods("GET")
-	messages.HandleFunc("", acceptsHandler(svc.Log, "GET", "POST"))
+	messages.HandleFunc("", messageHandler.List).Methods("GET", "HEAD")
+	messages.HandleFunc("", acceptsHandler(svc.Log, "GET", "HEAD", "POST"))
 
 	message := messages.HandleFunc("/{id}", messageHandler.Read).Subrouter()
-	message.HandleFunc("", messageHandler.Read).Methods("GET")
+	message.HandleFunc("", messageHandler.Read).Methods("GET", "HEAD")
 	message.HandleFunc("", messageHandler.Update).Methods("PUT")
 	message.HandleFunc("", messageHandler.Delete).Methods("DELETE")
-	message.HandleFunc("", acceptsHandler(svc.Log, "DELETE", "GET", "PUT"))
+	message.HandleFunc("", acceptsHandler(svc.Log, "DELETE", "GET", "HEAD", "PUT"))
 
 	n := negroni.New()
 	n.Use(negroni.NewRecovery())
@@ -68,6 +69,8 @@ func Handler(svc Services, cfg Config) (http.Handler, error) {
 }
 
 func acceptsHandler(log *logging.Logger, methods ...string) func(http.ResponseWriter, *http.Request) {
+	methods = append(methods, "OPTIONS")
+	sort.Strings(methods)
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "server.acceptsHandler"
 		if r.Method == "OPTIONS" {

@@ -50,7 +50,7 @@ func (mr *MessagesRepository) DeleteById(id MessageId) error {
 		return err
 	}
 	if affected != 1 {
-		return repoError2(op, fmt.Errorf("expected delete by id to delete 1 row but %d were deleted", affected))
+		return repoError2(op, idMissingError(op, id))
 	}
 	return nil
 }

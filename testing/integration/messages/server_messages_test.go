@@ -15,26 +15,8 @@ import (
 	"testing"
 )
 
-func TestMessages_405WhenMethodIsNotSupported(t *testing.T) {
-	t.Parallel()
-	h := noDbHandler(t)
-	for _, method := range allMethodsExcept("GET", "POST", "OPTIONS") {
-		t.Run("method "+method, func(t *testing.T) {
-			rr := httptest.NewRecorder()
-			h.ServeHTTP(rr, requestEmpty(t, method, "/messages"))
-			require.Equal(t, http.StatusMethodNotAllowed, rr.Code)
-			require.Equal(t, "Allow: GET, POST", rr.Body.String())
-		})
-	}
-}
-
-func TestMessages_canListOptions(t *testing.T) {
-	t.Parallel()
-	rr := httptest.NewRecorder()
-	noDbServe(t, rr, requestEmpty(t, "OPTIONS", "/messages"))
-	require.Equal(t, http.StatusOK, rr.Code)
-	require.Equal(t, "Allow: GET, POST", rr.Body.String())
-}
+// POST - /messages, GET - /messages/{id}
+// --------------------------------------------
 
 func TestMessages_canCreateAndGetAMessage(t *testing.T) {
 	db, dbClose := acquireDb(t)
@@ -79,34 +61,8 @@ func messageIdFromLocation(t *testing.T, uri string) msgs.MessageId {
 	return id
 }
 
-func TestMessages_returnsErrorWhen(t *testing.T) {
-	t.Parallel()
-	cases := []struct {
-		name string
-		rq   string
-		rs   string
-	}{
-		{
-			"empty message",
-			`{"message": ""}`,
-			`{"errors":[{"field":"message","error":"Message field cannot be blank."}]}` + "\n",
-		},
-		{
-			"invalid json",
-			`{{`,
-			`{"errors":[{"error":"invalid json"}]}` + "\n",
-		},
-	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			rr := httptest.NewRecorder()
-			noDbServe(t, rr, requestString(t, "POST", "/messages", c.rq))
-			require.Equal(t, http.StatusBadRequest, rr.Code)
-			requireJson(t, rr)
-			require.Equal(t, c.rs, rr.Body.String())
-		})
-	}
-}
+// DELETE - /messages/{id}
+// --------------------------------------------
 
 func TestMessage_canDeleteMessageAnd404WhenMessageDoesNotExist(t *testing.T) {
 	db, dbClose := acquireDb(t)
@@ -117,14 +73,27 @@ func TestMessage_canDeleteMessageAnd404WhenMessageDoesNotExist(t *testing.T) {
 	id, err := svc.MessagesService.Create(msgs.ModifyMessage{Message: "my message"})
 	require.NoError(t, err)
 
-	rr := httptest.NewRecorder()
-	h.ServeHTTP(rr, requestEmpty(t, "DELETE", uris.Message(id)))
-	require.Equal(t, http.StatusOK, rr.Code)
+	t.Run("can delete a message and get a 404 upon trying to request again", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, requestEmpty(t, "DELETE", uris.Message(id)))
+		require.Equal(t, http.StatusOK, rr.Code)
 
-	rr2 := httptest.NewRecorder()
-	h.ServeHTTP(rr2, requestEmpty(t, "GET", uris.Message(id)))
-	require.Equal(t, http.StatusNotFound, rr2.Code)
+		rr2 := httptest.NewRecorder()
+		h.ServeHTTP(rr2, requestEmpty(t, "GET", uris.Message(id)))
+		require.Equal(t, http.StatusNotFound, rr2.Code)
+	})
+
+	t.Run("delete returns 200 for non-existent message", func(t *testing.T) {
+		// See https://stackoverflow.com/questions/6474223/should-deleting-a-non-existent-resource-result-in-a-404-in-restful-rails
+		// for why this is the case.
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, requestEmpty(t, "DELETE", uris.Message(5)))
+		require.Equal(t, http.StatusOK, rr.Code)
+	})
 }
+
+// PUT - /messages/{id}
+// --------------------------------------------
 
 func TestMessage_canUpdateMessage(t *testing.T) {
 	db, dbClose := acquireDb(t)
@@ -149,6 +118,9 @@ func TestMessage_canUpdateMessage(t *testing.T) {
 	require.Equal(t, "new message", m.Message)
 }
 
+// GET - /messages
+// --------------------------------------------
+
 func TestMessage_canListMessages(t *testing.T) {
 	db, dbClose := acquireDb(t)
 	defer dbClose()
@@ -164,6 +136,19 @@ func TestMessage_canListMessages(t *testing.T) {
 	_, err = svc.MessagesService.Create(msgs.ModifyMessage{Message: "last message"})
 	require.NoError(t, err)
 
+	t.Run("show all messages by default", func(t *testing.T) {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?fields=message"))
+		requireJsonOk(t, rr)
+		expected := fmt.Sprintf(`{"messages":[` +
+			`{"message":"first message"},` +
+			`{"message":"second message"},` +
+			`{"message":"atttta"},` +
+			`{"message":"last message"}` +
+			"]}\n")
+		require.Equal(t, expected, rr.Body.String())
+	})
+
 	t.Run("with fields, pageSize, and pageStartIndex", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?fields=message,isPalindrome&pageSize=2&pageStartIndex=1"))
@@ -175,7 +160,7 @@ func TestMessage_canListMessages(t *testing.T) {
 		require.Equal(t, expected, rr.Body.String())
 	})
 
-	t.Run("show all fields when non specified in query", func(t *testing.T) {
+	t.Run("show all fields when no field filter specified in query", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?pageSize=1"))
 		requireJsonOk(t, rr)
@@ -215,6 +200,154 @@ func TestMessage_whenListingMessages_errors(t *testing.T) {
 		require.Equal(t, "{\"errors\":[\"invalid pageStartIndex value\"]}\n", rr.Body.String())
 	})
 }
+
+// * - /messages/{id}
+// --------------------------------------------
+
+func TestMessage_errorOnBadId(t *testing.T) {
+	for _, method := range []string{"GET", "PUT", "DELETE"} {
+		t.Run(fmt.Sprintf("error when id invalid for %s", method), func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			noDbServe(t, rr, requestEmpty(t, "GET", "/messages/duck"))
+			require.Equal(t, http.StatusBadRequest, rr.Code)
+			requireJson(t, rr)
+			require.Equal(t, "{\"errors\":[{\"error\":\"invalid message id\"}]}\n", rr.Body.String())
+		})
+	}
+}
+
+func TestMessage_404OnNotFound(t *testing.T) {
+	db, dbClose := acquireDb(t)
+	defer dbClose()
+
+	h, _ := handlerWithDb(t, db)
+
+	cases := []struct {
+		method string
+		body   string
+	}{
+		{"GET", ""},
+		{"HEAD", ""},
+		{"PUT", `{"message":"my message"}`},
+	}
+
+	for _, c := range cases {
+		t.Run(c.method, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			h.ServeHTTP(rr, requestString(t, c.method, uris.Message(5), c.body))
+			require.Equal(t, http.StatusNotFound, rr.Code)
+		})
+	}
+}
+
+func TestMessages_createOrUpdateReturnsErrorWhen(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name string
+		rq   string
+		rs   string
+	}{
+		{
+			"empty message",
+			`{"message": ""}`,
+			`{"errors":[{"field":"message","error":"Message field cannot be blank."}]}` + "\n",
+		},
+		{
+			"invalid json",
+			`{{`,
+			`{"errors":[{"error":"invalid json"}]}` + "\n",
+		},
+		{
+			"empty json",
+			``,
+			`{"errors":[{"error":"invalid json"}]}` + "\n",
+		},
+	}
+	methods := []struct {
+		method string
+		path   string
+	}{
+		{"POST", "/messages"},
+		{"PUT", uris.Message(1)},
+	}
+	for _, method := range methods {
+		for _, c := range cases {
+			t.Run(method.method+" - "+c.name, func(t *testing.T) {
+				rr := httptest.NewRecorder()
+				noDbServe(t, rr, requestString(t, method.method, method.path, c.rq))
+				require.Equal(t, http.StatusBadRequest, rr.Code)
+				requireJson(t, rr)
+				require.Equal(t, c.rs, rr.Body.String())
+			})
+		}
+	}
+}
+
+func TestMessages_OptionsMethodAndReturns405WhenMethodIsNotSupported(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		uri        string
+		badMethods []string
+		allow      string
+	}{
+		{
+			"/messages",
+			allMethodsExcept("GET", "POST", "OPTIONS", "HEAD"),
+			"GET, HEAD, OPTIONS, POST"},
+		{
+			"/messages/1",
+			allMethodsExcept("GET", "PUT", "DELETE", "OPTIONS", "HEAD"),
+			"DELETE, GET, HEAD, OPTIONS, PUT"},
+	}
+
+	h := noDbHandler(t)
+	for _, c := range cases {
+
+		t.Run("OPTIONS returns Allow for "+c.uri, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			h.ServeHTTP(rr, requestEmpty(t, "OPTIONS", c.uri))
+			require.Equal(t, http.StatusOK, rr.Code)
+			require.Equal(t, "Allow: "+c.allow, rr.Body.String())
+		})
+
+		for _, method := range c.badMethods {
+
+			t.Run("504 when method "+method+" "+c.uri, func(t *testing.T) {
+				rr := httptest.NewRecorder()
+				h.ServeHTTP(rr, requestEmpty(t, method, c.uri))
+				require.Equal(t, http.StatusMethodNotAllowed, rr.Code)
+				require.Equal(t, "Allow: "+c.allow, rr.Body.String())
+			})
+		}
+	}
+}
+
+func TestMessages_HeadRequests(t *testing.T) {
+	db, dbClose := acquireDb(t)
+	defer dbClose()
+
+	h, svc := handlerWithDb(t, db)
+
+	id, err := svc.MessagesService.Create(msgs.ModifyMessage{Message: "message"})
+	require.NoError(t, err)
+
+	cases := []string{
+		"/messages",
+		uris.Message(id),
+	}
+
+	for _, uri := range cases {
+		t.Run("HEAD for "+uri, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			h.ServeHTTP(rr, requestEmpty(t, "HEAD", uri))
+			require.Equal(t, http.StatusOK, rr.Code)
+			// Check no body is sent in the HEAD request.
+			require.Equal(t, "", rr.Body.String())
+		})
+	}
+}
+
+// helpers
 
 func requireJsonOk(t *testing.T, rr *httptest.ResponseRecorder) {
 	require.Equal(t, http.StatusOK, rr.Code)

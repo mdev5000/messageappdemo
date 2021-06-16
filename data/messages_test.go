@@ -106,7 +106,7 @@ func TestMessageRepository_DeleteById_returnsErrorWhenNoRowsAreDeleted(t *testin
 
 	err := mr.DeleteById(5)
 	require.EqualError(t, err,
-		"Error [internal] (MessagesRepository.DeleteById): expected delete by id to delete 1 row but 0 were deleted")
+		"Error [internal] (MessagesRepository.DeleteById): MessagesRepository.DeleteById: no row in result with id 5")
 }
 
 func TestMessagesRepository_UpdateById(t *testing.T) {

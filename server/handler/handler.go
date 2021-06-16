@@ -13,6 +13,12 @@ import (
 )
 
 func DecodeJsonOrError(log *logging.Logger, op string, w http.ResponseWriter, r *http.Request, v interface{}) bool {
+	if r.Body == nil {
+		appErr := apperrors.Error{Op: op, EType: apperrors.ETInvalid}
+		appErr.AddResponse(apperrors.ErrorResponse("invalid json"))
+		SendErrorResponse(log, op, w, &appErr)
+		return false
+	}
 	d := json.NewDecoder(r.Body)
 	if err := d.Decode(v); err != nil {
 		appErr := apperrors.Error{Op: op, EType: apperrors.ETInvalid, Err: err, Stack: errors.WithStack(err)}
@@ -45,8 +51,12 @@ func SendErrorResponse(log *logging.Logger, op string, w http.ResponseWriter, er
 	}
 }
 
-func EncodeJsonOrError(op string, log *logging.Logger, w http.ResponseWriter, v interface{}) bool {
+func EncodeJsonOrError(op string, log *logging.Logger, w http.ResponseWriter, r *http.Request, v interface{}) bool {
 	contentTypeJson(w)
+	// Don't return content if a HEAD request.
+	if r.Method == "HEAD" {
+		return true
+	}
 	enc := json.NewEncoder(w)
 	if err := enc.Encode(v); err != nil {
 		log.LogFailedToEncode(op, err, err, errors.WithStack(err))

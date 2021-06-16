@@ -1,6 +1,7 @@
 package messages
 
 import (
+	"errors"
 	"github.com/gorilla/mux"
 	"github.com/mdev5000/qlik_message/apperrors"
 	"github.com/mdev5000/qlik_message/logging"
@@ -57,7 +58,7 @@ func (h *Handler) Read(w http.ResponseWriter, r *http.Request) {
 
 	handler.SetETagInt(w, message.Version)
 	handler.SetLastModified(w, message.UpdatedAt)
-	handler.EncodeJsonOrError(op, h.log, w, messageToJsonValue(message))
+	handler.EncodeJsonOrError(op, h.log, w, r, messageToJsonValue(message))
 }
 
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
@@ -75,6 +76,10 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 
 	_, err := h.messagesSvc.Update(id, resp.toModifyMessage())
 	if err != nil {
+		if errors.Is(err, messages.IdMissingError{}) {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 		handler.SendErrorResponse(h.log, op, w, err)
 		return
 	}
@@ -88,7 +93,9 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.messagesSvc.Delete(id); err != nil {
+	// DELETE is an idempotent request and therefore should ways return 200 unless there's an error, see here for
+	// details: https://stackoverflow.com/questions/6474223/should-deleting-a-non-existent-resource-result-in-a-404-in-restful-rails
+	if err := h.messagesSvc.Delete(id); err != nil && !errors.Is(err, messages.IdMissingError{}) {
 		handler.SendErrorResponse(h.log, op, w, err)
 		return
 	}
@@ -122,7 +129,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 		out[i] = queryMessageToJsonValue(msg, fields)
 	}
 
-	handler.EncodeJsonOrError(op, h.log, w, MessageListResponseJSON{Messages: out})
+	handler.EncodeJsonOrError(op, h.log, w, r, MessageListResponseJSON{Messages: out})
 }
 
 func (h *Handler) readIdFromUri(op string, w http.ResponseWriter, r *http.Request) (messages.MessageId, bool) {
@@ -130,7 +137,7 @@ func (h *Handler) readIdFromUri(op string, w http.ResponseWriter, r *http.Reques
 	ids := vars["id"]
 	id, err := strconv.Atoi(ids)
 	if err != nil {
-		appErr := apperrors.Error{Op: op}
+		appErr := apperrors.Error{Op: op, EType: apperrors.ETInvalid}
 		appErr.AddResponse(apperrors.ErrorResponse("invalid message id"))
 		handler.SendErrorResponse(h.log, op, w, &appErr)
 		return 0, false

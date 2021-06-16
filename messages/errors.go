@@ -8,7 +8,7 @@ type IdMissingError struct {
 }
 
 func (e IdMissingError) Error() string {
-	return fmt.Sprintf("%s: no rows in result for get by id with id %d", e.Op, e.Id)
+	return fmt.Sprintf("%s: no row in result with id %d", e.Op, e.Id)
 }
 
 func (e IdMissingError) Is(target error) bool {
