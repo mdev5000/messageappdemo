@@ -11,10 +11,22 @@ precommit: fmt test.race.nocache cover lint
 # -------------------------------------------------------
 
 # Install all required dependencies that can reasonably be installed (ex. this will not install Docker).
-dependencies: dependencies.linting
+deps: deps.linting
 
-dependencies.linting:
+deps.linting:
 	go install honnef.co/go/tools/cmd/staticcheck@latest
+
+
+
+# BUILDING
+# -------------------------------------------------------
+
+# Build the application.
+build:
+	@rm -rf _build
+	@mkdir -p _build
+	go build -o _build/messageapp ./cmd/messageapp/messageapp.go
+	@echo "App can be found at: _build/messageapp"
 
 
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/mdev5000/qlik_message/approot"
 	"github.com/mdev5000/qlik_message/data"
@@ -18,7 +19,11 @@ func main() {
 }
 
 func run() error {
-	db, err := postgres.Open("postgres", "postgres", "postgres")
+	var noseed bool
+	flag.BoolVar(&noseed, "noseed", false, "When true will not purge and re-seed the database.")
+	flag.Parse()
+
+	db, err := postgres.OpenDev("postgres", "postgres", "postgres")
 	if err != nil {
 		return err
 	}
@@ -32,11 +37,15 @@ func run() error {
 	services := approot.Setup(db, log)
 
 	// Seed the database with dev data.
-	if err := data.PurgeDb(db); err != nil {
-		return err
-	}
-	if err := seed(services.MessagesService); err != nil {
-		return err
+	if !noseed {
+		fmt.Println("Delete existing data...")
+		if err := data.PurgeDb(db); err != nil {
+			return err
+		}
+		fmt.Println("Seeding database with dev data...")
+		if err := seed(services.MessagesService); err != nil {
+			return err
+		}
 	}
 
 	handler, err := server.Handler(server.Services{
@@ -49,6 +58,7 @@ func run() error {
 		return err
 	}
 
+	fmt.Println("Running at localhost:8000")
 	return http.ListenAndServe("localhost:8000", handler)
 }
 

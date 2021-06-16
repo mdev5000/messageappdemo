@@ -14,7 +14,12 @@ type Message struct {
 	Message string `db:"message"`
 }
 
-func Open(dbname, user, password string) (*DB, error) {
+func OpenUrl(postgresUrl string) (*DB, error) {
+	db, err := sqlx.Connect("postgres", postgresUrl)
+	return db, err
+}
+
+func OpenDev(dbname, user, password string) (*DB, error) {
 	db, err := sqlx.Connect("postgres",
 		fmt.Sprintf("user=%s dbname=%s password=%s sslmode=disable", user, dbname, password))
 	return db, err

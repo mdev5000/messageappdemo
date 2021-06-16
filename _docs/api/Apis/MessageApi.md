@@ -4,15 +4,73 @@ All URIs are relative to *http://localhost:8000*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**messagesIdGet**](MessageApi.md#messagesIdGet) | **GET** /messages/{id} | 
-[**messagesPost**](MessageApi.md#messagesPost) | **POST** /messages | 
+[**messageCreate**](MessageApi.md#messageCreate) | **POST** /messages | 
+[**messageDeleteById**](MessageApi.md#messageDeleteById) | **DELETE** /messages/{id} | 
+[**messageGetById**](MessageApi.md#messageGetById) | **GET** /messages/{id} | 
+[**messageUpdateById**](MessageApi.md#messageUpdateById) | **PUT** /messages/{id} | 
 
 
-<a name="messagesIdGet"></a>
-# **messagesIdGet**
-> Message messagesIdGet(id)
+<a name="messageCreate"></a>
+# **messageCreate**
+> messageCreate(MessageModify)
 
 
+
+    Create a new message.
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **MessageModify** | [**MessageModify**](../Models/MessageModify.md)|  | [optional]
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+<a name="messageDeleteById"></a>
+# **messageDeleteById**
+> messageDeleteById(id)
+
+
+
+    Delete a message.
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **Long**| Message Id | [default to null]
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
+
+<a name="messageGetById"></a>
+# **messageGetById**
+> Message messageGetById(id)
+
+
+
+    Retrieve an existing message.
 
 ### Parameters
 
@@ -33,16 +91,20 @@ No authorization required
 - **Content-Type**: Not defined
 - **Accept**: application/json
 
-<a name="messagesPost"></a>
-# **messagesPost**
-> messagesPost()
+<a name="messageUpdateById"></a>
+# **messageUpdateById**
+> messageUpdateById(id, MessageModify)
 
 
 
-    Create a new message.
+    Update a message.
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **Long**| Message Id | [default to null]
+ **MessageModify** | [**MessageModify**](../Models/MessageModify.md)|  | [optional]
 
 ### Return type
 
@@ -54,6 +116,6 @@ No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
-- **Accept**: Not defined
+- **Content-Type**: application/json
+- **Accept**: application/json
 

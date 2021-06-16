@@ -7,15 +7,19 @@ All URIs are relative to *http://localhost:8000*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**messagesGet**](Apis/DefaultApi.md#messagesget) | **GET** /messages | List all or a subset of existing messages
-*MessageApi* | [**messagesIdGet**](Apis/MessageApi.md#messagesidget) | **GET** /messages/{id} | 
-*MessageApi* | [**messagesPost**](Apis/MessageApi.md#messagespost) | **POST** /messages | Create a new message.
+*DefaultApi* | [**messageList**](Apis/DefaultApi.md#messagelist) | **GET** /messages | List all or a subset of existing messages
+*MessageApi* | [**messageCreate**](Apis/MessageApi.md#messagecreate) | **POST** /messages | Create a new message.
+*MessageApi* | [**messageDeleteById**](Apis/MessageApi.md#messagedeletebyid) | **DELETE** /messages/{id} | Delete a message.
+*MessageApi* | [**messageGetById**](Apis/MessageApi.md#messagegetbyid) | **GET** /messages/{id} | Retrieve an existing message.
+*MessageApi* | [**messageUpdateById**](Apis/MessageApi.md#messageupdatebyid) | **PUT** /messages/{id} | Update a message.
 
 
 <a name="documentation-for-models"></a>
 ## Documentation for Models
 
+ - [ErrorResponse](./Models/ErrorResponse.md)
  - [Message](./Models/Message.md)
+ - [MessageModify](./Models/MessageModify.md)
  - [SelectedMessage](./Models/SelectedMessage.md)
 
 

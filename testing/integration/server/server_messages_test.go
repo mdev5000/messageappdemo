@@ -1,4 +1,4 @@
-package messages
+package server
 
 import (
 	"bytes"
@@ -29,6 +29,7 @@ func TestMessages_canCreateAndGetAMessage(t *testing.T) {
 	h.ServeHTTP(rr, requestString(t, "POST", "/messages", `{"message": "my message"}`))
 	require.Equal(t, http.StatusCreated, rr.Code)
 	loc := rr.Header().Get("Location")
+	require.Equal(t, `"1"`, rr.Header().Get("ETag"))
 	require.True(t, regexp.MustCompile("^/messages/[0-9]+$").MatchString(loc))
 
 	id := messageIdFromLocation(t, loc)
@@ -113,6 +114,7 @@ func TestMessage_canUpdateMessage(t *testing.T) {
 	rr2 := httptest.NewRecorder()
 	h.ServeHTTP(rr2, requestEmpty(t, "GET", uris.Message(id)))
 	require.Equal(t, http.StatusOK, rr2.Code)
+	require.Equal(t, `"2"`, rr.Header().Get("ETag"))
 	var m messages.MessageResponseJSON
 	require.NoError(t, json.Unmarshal(rr2.Body.Bytes(), &m))
 	require.Equal(t, "new message", m.Message)

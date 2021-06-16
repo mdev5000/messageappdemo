@@ -5,9 +5,6 @@ services:
     image: postgres:13.3
     container_name: db
     restart: always
-#    volumes:
-#      - ./_devdb:/var/lib/postgresql/data
-#    user: "${UID}:${GID}"
     ports:
       - "5432:5432"
     environment:

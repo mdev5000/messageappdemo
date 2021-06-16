@@ -846,6 +846,20 @@ ul.nav-tabs {
   <script>
     // Script section to load models into a JS Var
     var defs = {}
+    defs["ErrorResponse"] = {
+  "required" : [ "error" ],
+  "type" : "object",
+  "properties" : {
+    "error" : {
+      "type" : "array",
+      "description" : "A list of errors that occurred.",
+      "items" : {
+        "type" : "object"
+      }
+    }
+  },
+  "description" : "Returns a description of the error that occurred."
+};
     defs["Message"] = {
   "required" : [ "createdAt", "id", "message", "updatedAt", "version" ],
   "type" : "object",
@@ -877,6 +891,18 @@ ul.nav-tabs {
   },
   "description" : "Contains information on a specific message posted"
 };
+    defs["MessageModify"] = {
+  "required" : [ "message" ],
+  "type" : "object",
+  "properties" : {
+    "message" : {
+      "type" : "string",
+      "description" : "The message text to post.",
+      "format" : "string"
+    }
+  },
+  "description" : "Fields for creating or updating a message."
+};
     defs["SelectedMessage"] = {
   "type" : "object",
   "properties" : {
@@ -896,12 +922,12 @@ ul.nav-tabs {
     },
     "createdAt" : {
       "type" : "string",
-      "description" : "Time the message was first created",
+      "description" : "Time the message was first created.",
       "format" : "timestamp"
     },
     "updatedAt" : {
       "type" : "string",
-      "description" : "Time the message was last updated",
+      "description" : "Time the message was last updated.",
       "format" : "timestamp"
     }
   },
@@ -926,15 +952,21 @@ ul.nav-tabs {
             <li class="nav-fixed nav-header active" data-group="_"><a href="#api-_">API Summary</a></li>
 
                   <li class="nav-header" data-group="Default"><a href="#api-Default">API Methods - Default</a></li>
-                    <li data-group="Default" data-name="messagesGet" class="">
-                      <a href="#api-Default-messagesGet">messagesGet</a>
+                    <li data-group="Default" data-name="messageList" class="">
+                      <a href="#api-Default-messageList">messageList</a>
                     </li>
                   <li class="nav-header" data-group="Message"><a href="#api-Message">API Methods - Message</a></li>
-                    <li data-group="Message" data-name="messagesIdGet" class="">
-                      <a href="#api-Message-messagesIdGet">messagesIdGet</a>
+                    <li data-group="Message" data-name="messageCreate" class="">
+                      <a href="#api-Message-messageCreate">messageCreate</a>
                     </li>
-                    <li data-group="Message" data-name="messagesPost" class="">
-                      <a href="#api-Message-messagesPost">messagesPost</a>
+                    <li data-group="Message" data-name="messageDeleteById" class="">
+                      <a href="#api-Message-messageDeleteById">messageDeleteById</a>
+                    </li>
+                    <li data-group="Message" data-name="messageGetById" class="">
+                      <a href="#api-Message-messageGetById">messageGetById</a>
+                    </li>
+                    <li data-group="Message" data-name="messageUpdateById" class="">
+                      <a href="#api-Message-messageUpdateById">messageUpdateById</a>
                     </li>
           </ul>
         </nav>
@@ -959,10 +991,10 @@ ul.nav-tabs {
         <div id="sections">
                 <section id="api-Default">
                   <h1>Default</h1>
-                    <div id="api-Default-messagesGet">
-                      <article id="api-Default-messagesGet-0" data-group="User" data-name="messagesGet" data-version="0">
+                    <div id="api-Default-messageList">
+                      <article id="api-Default-messageList-0" data-group="User" data-name="messageList" data-version="0">
                         <div class="pull-left">
-                          <h1>messagesGet</h1>
+                          <h1>messageList</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
@@ -976,27 +1008,27 @@ ul.nav-tabs {
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Default-messagesGet-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Default-messagesGet-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Default-messagesGet-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Default-messagesGet-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Default-messagesGet-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Default-messagesGet-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Default-messagesGet-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Default-messagesGet-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Default-messagesGet-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Default-messagesGet-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Default-messagesGet-0-python">Python</a></li>
-                          <li class=""><a href="#examples-Default-messagesGet-0-rust">Rust</a></li>
+                          <li class="active"><a href="#examples-Default-messageList-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Default-messageList-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Default-messageList-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Default-messageList-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Default-messageList-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Default-messageList-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Default-messageList-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Default-messageList-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Default-messageList-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Default-messageList-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Default-messageList-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Default-messageList-0-rust">Rust</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Default-messagesGet-0-curl">
+                          <div class="tab-pane active" id="examples-Default-messageList-0-curl">
                             <pre class="prettyprint"><code class="language-bsh">curl -X GET\
  -H "Accept: application/json"\
  "http://localhost:8000/messages"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Default-messagesGet-0-java">
+                          <div class="tab-pane" id="examples-Default-messageList-0-java">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
 import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
@@ -1012,10 +1044,10 @@ public class DefaultApiExample {
         DefaultApi apiInstance = new DefaultApi();
         
         try {
-            SelectedMessage result = apiInstance.messagesGet();
+            SelectedMessage result = apiInstance.messageList();
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling DefaultApi#messagesGet");
+            System.err.println("Exception when calling DefaultApi#messageList");
             e.printStackTrace();
         }
     }
@@ -1023,7 +1055,7 @@ public class DefaultApiExample {
 </code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Default-messagesGet-0-android">
+                          <div class="tab-pane" id="examples-Default-messageList-0-android">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.DefaultApi;
 
 public class DefaultApiExample {
@@ -1031,26 +1063,26 @@ public class DefaultApiExample {
         DefaultApi apiInstance = new DefaultApi();
         
         try {
-            SelectedMessage result = apiInstance.messagesGet();
+            SelectedMessage result = apiInstance.messageList();
             System.out.println(result);
         } catch (ApiException e) {
-            System.err.println("Exception when calling DefaultApi#messagesGet");
+            System.err.println("Exception when calling DefaultApi#messageList");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Default-messagesGet-0-groovy">
+  <div class="tab-pane" id="examples-Default-messageList-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Default-messagesGet-0-objc">
+                            <div class="tab-pane" id="examples-Default-messageList-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">
 
 // Create an instance of the API class
 DefaultApi *apiInstance = [[DefaultApi alloc] init];
 
-[apiInstance messagesGetWithCompletionHandler: 
+[apiInstance messageListWithCompletionHandler: 
               ^(SelectedMessage output, NSError* error) {
     if (output) {
         NSLog(@"%@", output);
@@ -1062,7 +1094,7 @@ DefaultApi *apiInstance = [[DefaultApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Default-messagesGet-0-javascript">
+                            <div class="tab-pane" id="examples-Default-messageList-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Title = require('title');
 
 // Create an instance of the API class
@@ -1074,14 +1106,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.messagesGet(callback);
+api.messageList(callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Default-messagesGet-0-angular">
+                            <!--<div class="tab-pane" id="examples-Default-messageList-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Default-messagesGet-0-csharp">
+                            <div class="tab-pane" id="examples-Default-messageList-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using Org.OpenAPITools.Api;
@@ -1090,7 +1122,7 @@ using Org.OpenAPITools.Model;
 
 namespace Example
 {
-    public class messagesGetExample
+    public class messageListExample
     {
         public void main()
         {
@@ -1099,10 +1131,10 @@ namespace Example
             var apiInstance = new DefaultApi();
 
             try {
-                SelectedMessage result = apiInstance.messagesGet();
+                SelectedMessage result = apiInstance.messageList();
                 Debug.WriteLine(result);
             } catch (Exception e) {
-                Debug.Print("Exception when calling DefaultApi.messagesGet: " + e.Message );
+                Debug.Print("Exception when calling DefaultApi.messageList: " + e.Message );
             }
         }
     }
@@ -1110,7 +1142,7 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Default-messagesGet-0-php">
+                            <div class="tab-pane" id="examples-Default-messageList-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
@@ -1118,15 +1150,15 @@ require_once(__DIR__ . '/vendor/autoload.php');
 $api_instance = new OpenAPITools\Client\Api\DefaultApi();
 
 try {
-    $result = $api_instance->messagesGet();
+    $result = $api_instance->messageList();
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling DefaultApi->messagesGet: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling DefaultApi->messageList: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Default-messagesGet-0-perl">
+                            <div class="tab-pane" id="examples-Default-messageList-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::OPenAPIClient::Configuration;
 use WWW::OPenAPIClient::DefaultApi;
@@ -1135,15 +1167,15 @@ use WWW::OPenAPIClient::DefaultApi;
 my $api_instance = WWW::OPenAPIClient::DefaultApi->new();
 
 eval { 
-    my $result = $api_instance->messagesGet();
+    my $result = $api_instance->messageList();
     print Dumper($result);
 };
 if ($@) {
-    warn "Exception when calling DefaultApi->messagesGet: $@\n";
+    warn "Exception when calling DefaultApi->messageList: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Default-messagesGet-0-python">
+                            <div class="tab-pane" id="examples-Default-messageList-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import openapi_client
@@ -1154,19 +1186,19 @@ from pprint import pprint
 api_instance = openapi_client.DefaultApi()
 
 try: 
-    api_response = api_instance.messages_get()
+    api_response = api_instance.message_list()
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling DefaultApi->messagesGet: %s\n" % e)</code></pre>
+    print("Exception when calling DefaultApi->messageList: %s\n" % e)</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Default-messagesGet-0-rust">
+                            <div class="tab-pane" id="examples-Default-messageList-0-rust">
                               <pre class="prettyprint"><code class="language-rust">extern crate DefaultApi;
 
 pub fn main() {
 
     let mut context = DefaultApi::Context::default();
-    let result = client.messagesGet(&context).wait();
+    let result = client.messageList(&context).wait();
 
     println!("{:?}", result);
 }
@@ -1187,23 +1219,23 @@ pub fn main() {
 
 
                           <h2>Responses</h2>
-                            <h3 id="examples-Default-messagesGet-title-200"></h3>
-                            <p id="examples-Default-messagesGet-description-200" class="marked"></p>
+                            <h3 id="examples-Default-messageList-title-200"></h3>
+                            <p id="examples-Default-messageList-description-200" class="marked"></p>
                             <script>
                               var responseDefault200_description = `Returned when the request succeeded.`;
                               var responseDefault200_description_break = responseDefault200_description.indexOf('\n');
                               if (responseDefault200_description_break == -1) {
-                                $("#examples-Default-messagesGet-title-200").text("Status: 200 - " + responseDefault200_description);
+                                $("#examples-Default-messageList-title-200").text("Status: 200 - " + responseDefault200_description);
                               } else {
-                                $("#examples-Default-messagesGet-title-200").text("Status: 200 - " + responseDefault200_description.substring(0, responseDefault200_description_break));
-                                $("#examples-Default-messagesGet-description-200").html(responseDefault200_description.substring(responseDefault200_description_break));
+                                $("#examples-Default-messageList-title-200").text("Status: 200 - " + responseDefault200_description.substring(0, responseDefault200_description_break));
+                                $("#examples-Default-messageList-description-200").html(responseDefault200_description.substring(responseDefault200_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Default-messagesGet-200" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Default-messageList-200" class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-Default-messagesGet-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-Default-messageList-200-schema">Schema</a>
                                 </li>
 
 
@@ -1212,9 +1244,9 @@ pub fn main() {
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Default-messagesGet-200-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Default-messagesGet-200-schema">
-                                  <div id="responses-Default-messagesGet-schema-200" class="exampleStyle">
+                            <div class="tab-content" id="responses-Default-messageList-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Default-messageList-200-schema">
+                                  <div id="responses-Default-messageList-schema-200" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
@@ -1243,14 +1275,14 @@ pub fn main() {
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Default-messagesGet-200-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Default-messagesGet-schema-200');
+                                        $('#responses-Default-messageList-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Default-messageList-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Default-messagesGet-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Default-messageList-200-schema-data' type='hidden' value=''></input>
                                 </div>
                             </div>
                         </article>
@@ -1259,44 +1291,436 @@ pub fn main() {
                   </section>
                 <section id="api-Message">
                   <h1>Message</h1>
-                    <div id="api-Message-messagesIdGet">
-                      <article id="api-Message-messagesIdGet-0" data-group="User" data-name="messagesIdGet" data-version="0">
+                    <div id="api-Message-messageCreate">
+                      <article id="api-Message-messageCreate-0" data-group="User" data-name="messageCreate" data-version="0">
                         <div class="pull-left">
-                          <h1>messagesIdGet</h1>
+                          <h1>messageCreate</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked"></p>
+                        <p class="marked">Create a new message.</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/messages/{id}</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/messages</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Message-messagesIdGet-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Message-messagesIdGet-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Message-messagesIdGet-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Message-messagesIdGet-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Message-messagesIdGet-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Message-messagesIdGet-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Message-messagesIdGet-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Message-messagesIdGet-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Message-messagesIdGet-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Message-messagesIdGet-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Message-messagesIdGet-0-python">Python</a></li>
-                          <li class=""><a href="#examples-Message-messagesIdGet-0-rust">Rust</a></li>
+                          <li class="active"><a href="#examples-Message-messageCreate-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Message-messageCreate-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Message-messageCreate-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Message-messageCreate-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Message-messageCreate-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Message-messageCreate-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Message-messageCreate-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Message-messageCreate-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Message-messageCreate-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Message-messageCreate-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Message-messageCreate-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Message-messageCreate-0-rust">Rust</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Message-messagesIdGet-0-curl">
-                            <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+                          <div class="tab-pane active" id="examples-Message-messageCreate-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X POST\
  -H "Accept: application/json"\
+ -H "Content-Type: application/json"\
+ "http://localhost:8000/messages"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Message-messageCreate-0-java">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
+import org.openapitools.client.auth.*;
+import org.openapitools.client.model.*;
+import org.openapitools.client.api.MessageApi;
+
+import java.io.File;
+import java.util.*;
+
+public class MessageApiExample {
+    public static void main(String[] args) {
+        
+        // Create an instance of the API class
+        MessageApi apiInstance = new MessageApi();
+        MessageModify messageModify = ; // MessageModify | 
+        
+        try {
+            apiInstance.messageCreate(messageModify);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling MessageApi#messageCreate");
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Message-messageCreate-0-android">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.MessageApi;
+
+public class MessageApiExample {
+    public static void main(String[] args) {
+        MessageApi apiInstance = new MessageApi();
+        MessageModify messageModify = ; // MessageModify | 
+        
+        try {
+            apiInstance.messageCreate(messageModify);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling MessageApi#messageCreate");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Message-messageCreate-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Message-messageCreate-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+
+// Create an instance of the API class
+MessageApi *apiInstance = [[MessageApi alloc] init];
+MessageModify *messageModify = ; //  (optional)
+
+[apiInstance messageCreateWith:messageModify
+              completionHandler: ^(NSError* error) {
+    if (error) {
+        NSLog(@"Error: %@", error);
+    }
+}];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageCreate-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var Title = require('title');
+
+// Create an instance of the API class
+var api = new Title.MessageApi()
+var opts = {
+  'messageModify':  // {MessageModify} 
+};
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+api.messageCreate(opts, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Message-messageCreate-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Message-messageCreate-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
+using Org.OpenAPITools.Model;
+
+namespace Example
+{
+    public class messageCreateExample
+    {
+        public void main()
+        {
+            
+            // Create an instance of the API class
+            var apiInstance = new MessageApi();
+            var messageModify = new MessageModify(); // MessageModify |  (optional) 
+
+            try {
+                apiInstance.messageCreate(messageModify);
+            } catch (Exception e) {
+                Debug.Print("Exception when calling MessageApi.messageCreate: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageCreate-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Create an instance of the API class
+$api_instance = new OpenAPITools\Client\Api\MessageApi();
+$messageModify = ; // MessageModify | 
+
+try {
+    $api_instance->messageCreate($messageModify);
+} catch (Exception $e) {
+    echo 'Exception when calling MessageApi->messageCreate: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageCreate-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::OPenAPIClient::Configuration;
+use WWW::OPenAPIClient::MessageApi;
+
+# Create an instance of the API class
+my $api_instance = WWW::OPenAPIClient::MessageApi->new();
+my $messageModify = WWW::OPenAPIClient::Object::MessageModify->new(); # MessageModify | 
+
+eval { 
+    $api_instance->messageCreate(messageModify => $messageModify);
+};
+if ($@) {
+    warn "Exception when calling MessageApi->messageCreate: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageCreate-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+
+# Create an instance of the API class
+api_instance = openapi_client.MessageApi()
+messageModify =  # MessageModify |  (optional)
+
+try: 
+    api_instance.message_create(messageModify=messageModify)
+except ApiException as e:
+    print("Exception when calling MessageApi->messageCreate: %s\n" % e)</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageCreate-0-rust">
+                              <pre class="prettyprint"><code class="language-rust">extern crate MessageApi;
+
+pub fn main() {
+    let messageModify = ; // MessageModify
+
+    let mut context = MessageApi::Context::default();
+    let result = client.messageCreate(messageModify, &context).wait();
+
+    println!("{:?}", result);
+}
+</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Scopes</h2>
+                          <table>
+                            
+                          </table>
+
+                          <h2>Parameters</h2>
+
+
+
+                            <div class="methodsubtabletitle">Body parameters</div>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">messageModify </td>
+<td>
+<p class="marked"></p>
+<script>
+$(document).ready(function() {
+  var schemaWrapper = {
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/MessageModify"
+      }
+    }
+  }
+};
+
+  var schema = findNode('schema',schemaWrapper).schema;
+  if (!schema) {
+    schema = schemaWrapper.schema;
+  }
+  if (schema.$ref != null) {
+    schema = defsParser.$refs.get(schema.$ref);
+  } else {
+    schemaWrapper.definitions = Object.assign({}, defs);
+    $RefParser.dereference(schemaWrapper).catch(function(err) {
+      console.log(err);
+    });
+  }
+
+  var view = new JSONSchemaView(schema,2,{isBodyParam: true});
+  var result = $('#d2e199_messageCreate_messageModify');
+  result.empty();
+  result.append(view.render());
+});
+</script>
+<div id="d2e199_messageCreate_messageModify"></div>
+</td>
+</tr>
+
+                            </table>
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Message-messageCreate-title-201"></h3>
+                            <p id="examples-Message-messageCreate-description-201" class="marked"></p>
+                            <script>
+                              var responseMessage201_description = `Indicates the message was created successfully.`;
+                              var responseMessage201_description_break = responseMessage201_description.indexOf('\n');
+                              if (responseMessage201_description_break == -1) {
+                                $("#examples-Message-messageCreate-title-201").text("Status: 201 - " + responseMessage201_description);
+                              } else {
+                                $("#examples-Message-messageCreate-title-201").text("Status: 201 - " + responseMessage201_description.substring(0, responseMessage201_description_break));
+                                $("#examples-Message-messageCreate-description-201").html(responseMessage201_description.substring(responseMessage201_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Message-messageCreate-201" class="nav nav-tabs nav-tabs-examples" >
+
+                                <li class="">
+                                  <a data-toggle="tab" href="#responses-messageCreate-201-headers">Headers</a>
+                                </li>
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Message-messageCreate-201-wrapper" style='margin-bottom: 10px;'>
+                                  <div class="tab-pane" id="responses-messageCreate-201-headers">
+                                      <table>
+                                          <tr>
+                                              <th width="150px">Name</th>
+                                              <th width="100px">Type</th>
+                                              <th width="100px">Format</th>
+                                              <th>Description</th>
+                                          </tr>
+                                              <tr>
+                                                  <td>Location</td>
+                                                  <td>Long</td>
+                                                  <td>int64</td>
+                                                  <td>Path to the newly created message</td>
+                                              </tr>
+                                              <tr>
+                                                  <td>ETag</td>
+                                                  <td>Long</td>
+                                                  <td>int64</td>
+                                                  <td>Returns the current version number for the message.</td>
+                                              </tr>
+                                      </table>
+                                  </div>
+                            </div>
+                            <h3 id="examples-Message-messageCreate-title-400"></h3>
+                            <p id="examples-Message-messageCreate-description-400" class="marked"></p>
+                            <script>
+                              var responseMessage400_description = `Returned if an error occurred while processing the request.`;
+                              var responseMessage400_description_break = responseMessage400_description.indexOf('\n');
+                              if (responseMessage400_description_break == -1) {
+                                $("#examples-Message-messageCreate-title-400").text("Status: 400 - " + responseMessage400_description);
+                              } else {
+                                $("#examples-Message-messageCreate-title-400").text("Status: 400 - " + responseMessage400_description.substring(0, responseMessage400_description_break));
+                                $("#examples-Message-messageCreate-description-400").html(responseMessage400_description.substring(responseMessage400_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Message-messageCreate-400" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Message-messageCreate-400-schema">Schema</a>
+                                </li>
+
+
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Message-messageCreate-400-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Message-messageCreate-400-schema">
+                                  <div id="responses-Message-messageCreate-schema-400" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Returned if an error occurred while processing the request.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/ErrorResponse"
+      }
+    }
+  }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Message-messageCreate-400-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Message-messageCreate-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Message-messageCreate-400-schema-data' type='hidden' value=''></input>
+                                </div>
+                            </div>
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Message-messageDeleteById">
+                      <article id="api-Message-messageDeleteById-0" data-group="User" data-name="messageDeleteById" data-version="0">
+                        <div class="pull-left">
+                          <h1>messageDeleteById</h1>
+                          <p></p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">Delete a message.</p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="delete"><code><span class="pln">/messages/{id}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Message-messageDeleteById-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Message-messageDeleteById-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Message-messageDeleteById-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Message-messageDeleteById-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Message-messageDeleteById-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Message-messageDeleteById-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Message-messageDeleteById-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Message-messageDeleteById-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Message-messageDeleteById-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Message-messageDeleteById-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Message-messageDeleteById-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Message-messageDeleteById-0-rust">Rust</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Message-messageDeleteById-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X DELETE\
  "http://localhost:8000/messages/{id}"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Message-messagesIdGet-0-java">
+                          <div class="tab-pane" id="examples-Message-messageDeleteById-0-java">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
 import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
@@ -1313,10 +1737,9 @@ public class MessageApiExample {
         Long id = 789; // Long | Message Id
         
         try {
-            Message result = apiInstance.messagesIdGet(id);
-            System.out.println(result);
+            apiInstance.messageDeleteById(id);
         } catch (ApiException e) {
-            System.err.println("Exception when calling MessageApi#messagesIdGet");
+            System.err.println("Exception when calling MessageApi#messageDeleteById");
             e.printStackTrace();
         }
     }
@@ -1324,7 +1747,7 @@ public class MessageApiExample {
 </code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Message-messagesIdGet-0-android">
+                          <div class="tab-pane" id="examples-Message-messageDeleteById-0-android">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.MessageApi;
 
 public class MessageApiExample {
@@ -1333,31 +1756,27 @@ public class MessageApiExample {
         Long id = 789; // Long | Message Id
         
         try {
-            Message result = apiInstance.messagesIdGet(id);
-            System.out.println(result);
+            apiInstance.messageDeleteById(id);
         } catch (ApiException e) {
-            System.err.println("Exception when calling MessageApi#messagesIdGet");
+            System.err.println("Exception when calling MessageApi#messageDeleteById");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Message-messagesIdGet-0-groovy">
+  <div class="tab-pane" id="examples-Message-messageDeleteById-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Message-messagesIdGet-0-objc">
+                            <div class="tab-pane" id="examples-Message-messageDeleteById-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">
 
 // Create an instance of the API class
 MessageApi *apiInstance = [[MessageApi alloc] init];
 Long *id = 789; // Message Id (default to null)
 
-[apiInstance messagesIdGetWith:id
-              completionHandler: ^(Message output, NSError* error) {
-    if (output) {
-        NSLog(@"%@", output);
-    }
+[apiInstance messageDeleteByIdWith:id
+              completionHandler: ^(NSError* error) {
     if (error) {
         NSLog(@"Error: %@", error);
     }
@@ -1365,7 +1784,7 @@ Long *id = 789; // Message Id (default to null)
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesIdGet-0-javascript">
+                            <div class="tab-pane" id="examples-Message-messageDeleteById-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Title = require('title');
 
 // Create an instance of the API class
@@ -1376,17 +1795,17 @@ var callback = function(error, data, response) {
   if (error) {
     console.error(error);
   } else {
-    console.log('API called successfully. Returned data: ' + data);
+    console.log('API called successfully.');
   }
 };
-api.messagesIdGet(id, callback);
+api.messageDeleteById(id, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Message-messagesIdGet-0-angular">
+                            <!--<div class="tab-pane" id="examples-Message-messageDeleteById-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Message-messagesIdGet-0-csharp">
+                            <div class="tab-pane" id="examples-Message-messageDeleteById-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using Org.OpenAPITools.Api;
@@ -1395,7 +1814,7 @@ using Org.OpenAPITools.Model;
 
 namespace Example
 {
-    public class messagesIdGetExample
+    public class messageDeleteByIdExample
     {
         public void main()
         {
@@ -1405,10 +1824,9 @@ namespace Example
             var id = 789;  // Long | Message Id (default to null)
 
             try {
-                Message result = apiInstance.messagesIdGet(id);
-                Debug.WriteLine(result);
+                apiInstance.messageDeleteById(id);
             } catch (Exception e) {
-                Debug.Print("Exception when calling MessageApi.messagesIdGet: " + e.Message );
+                Debug.Print("Exception when calling MessageApi.messageDeleteById: " + e.Message );
             }
         }
     }
@@ -1416,7 +1834,7 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesIdGet-0-php">
+                            <div class="tab-pane" id="examples-Message-messageDeleteById-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
@@ -1425,15 +1843,14 @@ $api_instance = new OpenAPITools\Client\Api\MessageApi();
 $id = 789; // Long | Message Id
 
 try {
-    $result = $api_instance->messagesIdGet($id);
-    print_r($result);
+    $api_instance->messageDeleteById($id);
 } catch (Exception $e) {
-    echo 'Exception when calling MessageApi->messagesIdGet: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling MessageApi->messageDeleteById: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesIdGet-0-perl">
+                            <div class="tab-pane" id="examples-Message-messageDeleteById-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::OPenAPIClient::Configuration;
 use WWW::OPenAPIClient::MessageApi;
@@ -1443,15 +1860,14 @@ my $api_instance = WWW::OPenAPIClient::MessageApi->new();
 my $id = 789; # Long | Message Id
 
 eval { 
-    my $result = $api_instance->messagesIdGet(id => $id);
-    print Dumper($result);
+    $api_instance->messageDeleteById(id => $id);
 };
 if ($@) {
-    warn "Exception when calling MessageApi->messagesIdGet: $@\n";
+    warn "Exception when calling MessageApi->messageDeleteById: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesIdGet-0-python">
+                            <div class="tab-pane" id="examples-Message-messageDeleteById-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import openapi_client
@@ -1463,20 +1879,19 @@ api_instance = openapi_client.MessageApi()
 id = 789 # Long | Message Id (default to null)
 
 try: 
-    api_response = api_instance.messages_id_get(id)
-    pprint(api_response)
+    api_instance.message_delete_by_id(id)
 except ApiException as e:
-    print("Exception when calling MessageApi->messagesIdGet: %s\n" % e)</code></pre>
+    print("Exception when calling MessageApi->messageDeleteById: %s\n" % e)</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesIdGet-0-rust">
+                            <div class="tab-pane" id="examples-Message-messageDeleteById-0-rust">
                               <pre class="prettyprint"><code class="language-rust">extern crate MessageApi;
 
 pub fn main() {
     let id = 789; // Long
 
     let mut context = MessageApi::Context::default();
-    let result = client.messagesIdGet(id, &context).wait();
+    let result = client.messageDeleteById(id, &context).wait();
 
     println!("{:?}", result);
 }
@@ -1501,7 +1916,7 @@ pub fn main() {
 <td>
 
 
-    <div id="d2e199_messagesIdGet_id">
+    <div id="d2e199_messageDeleteById_id">
         <div class="json-schema-view">
             <div class="primitive">
                 <span class="type">
@@ -1530,37 +1945,333 @@ Message Id
 
 
                           <h2>Responses</h2>
-                            <h3 id="examples-Message-messagesIdGet-title-200"></h3>
-                            <p id="examples-Message-messagesIdGet-description-200" class="marked"></p>
+                            <h3 id="examples-Message-messageDeleteById-title-200"></h3>
+                            <p id="examples-Message-messageDeleteById-description-200" class="marked"></p>
                             <script>
-                              var responseMessage200_description = `Successful operation`;
+                              var responseMessage200_description = `Returned when either the message was deleted or it did not exist.`;
                               var responseMessage200_description_break = responseMessage200_description.indexOf('\n');
                               if (responseMessage200_description_break == -1) {
-                                $("#examples-Message-messagesIdGet-title-200").text("Status: 200 - " + responseMessage200_description);
+                                $("#examples-Message-messageDeleteById-title-200").text("Status: 200 - " + responseMessage200_description);
                               } else {
-                                $("#examples-Message-messagesIdGet-title-200").text("Status: 200 - " + responseMessage200_description.substring(0, responseMessage200_description_break));
-                                $("#examples-Message-messagesIdGet-description-200").html(responseMessage200_description.substring(responseMessage200_description_break));
+                                $("#examples-Message-messageDeleteById-title-200").text("Status: 200 - " + responseMessage200_description.substring(0, responseMessage200_description_break));
+                                $("#examples-Message-messageDeleteById-description-200").html(responseMessage200_description.substring(responseMessage200_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Message-messagesIdGet-200" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Message-messageDeleteById-200" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Message-messageDeleteById-200-wrapper" style='margin-bottom: 10px;'>
+                            </div>
+                        </article>
+                      </div>
+                      <hr>
+                    <div id="api-Message-messageGetById">
+                      <article id="api-Message-messageGetById-0" data-group="User" data-name="messageGetById" data-version="0">
+                        <div class="pull-left">
+                          <h1>messageGetById</h1>
+                          <p></p>
+                        </div>
+                        <div class="pull-right"></div>
+                        <div class="clearfix"></div>
+                        <p></p>
+                        <p class="marked">Retrieve an existing message.</p>
+                        <p></p>
+                        <br />
+                        <pre class="prettyprint language-html prettyprinted" data-type="get"><code><span class="pln">/messages/{id}</span></code></pre>
+                        <p>
+                          <h3>Usage and SDK Samples</h3>
+                        </p>
+                        <ul class="nav nav-tabs nav-tabs-examples">
+                          <li class="active"><a href="#examples-Message-messageGetById-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Message-messageGetById-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Message-messageGetById-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Message-messageGetById-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Message-messageGetById-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Message-messageGetById-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Message-messageGetById-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Message-messageGetById-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Message-messageGetById-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Message-messageGetById-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Message-messageGetById-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Message-messageGetById-0-rust">Rust</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div class="tab-pane active" id="examples-Message-messageGetById-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X GET\
+ -H "Accept: application/json"\
+ "http://localhost:8000/messages/{id}"</code></pre>
+                          </div>
+                          <div class="tab-pane" id="examples-Message-messageGetById-0-java">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
+import org.openapitools.client.auth.*;
+import org.openapitools.client.model.*;
+import org.openapitools.client.api.MessageApi;
+
+import java.io.File;
+import java.util.*;
+
+public class MessageApiExample {
+    public static void main(String[] args) {
+        
+        // Create an instance of the API class
+        MessageApi apiInstance = new MessageApi();
+        Long id = 789; // Long | Message Id
+        
+        try {
+            Message result = apiInstance.messageGetById(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling MessageApi#messageGetById");
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+                          </div>
+
+                          <div class="tab-pane" id="examples-Message-messageGetById-0-android">
+                            <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.MessageApi;
+
+public class MessageApiExample {
+    public static void main(String[] args) {
+        MessageApi apiInstance = new MessageApi();
+        Long id = 789; // Long | Message Id
+        
+        try {
+            Message result = apiInstance.messageGetById(id);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling MessageApi#messageGetById");
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+                          </div>
+  <!--
+  <div class="tab-pane" id="examples-Message-messageGetById-0-groovy">
+  <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+  </div> -->
+                            <div class="tab-pane" id="examples-Message-messageGetById-0-objc">
+                              <pre class="prettyprint"><code class="language-cpp">
+
+// Create an instance of the API class
+MessageApi *apiInstance = [[MessageApi alloc] init];
+Long *id = 789; // Message Id (default to null)
+
+[apiInstance messageGetByIdWith:id
+              completionHandler: ^(Message output, NSError* error) {
+    if (output) {
+        NSLog(@"%@", output);
+    }
+    if (error) {
+        NSLog(@"Error: %@", error);
+    }
+}];
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageGetById-0-javascript">
+                              <pre class="prettyprint"><code class="language-js">var Title = require('title');
+
+// Create an instance of the API class
+var api = new Title.MessageApi()
+var id = 789; // {Long} Message Id
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+api.messageGetById(id, callback);
+</code></pre>
+                            </div>
+
+                            <!--<div class="tab-pane" id="examples-Message-messageGetById-0-angular">
+              <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
+            </div>-->
+                            <div class="tab-pane" id="examples-Message-messageGetById-0-csharp">
+                              <pre class="prettyprint"><code class="language-cs">using System;
+using System.Diagnostics;
+using Org.OpenAPITools.Api;
+using Org.OpenAPITools.Client;
+using Org.OpenAPITools.Model;
+
+namespace Example
+{
+    public class messageGetByIdExample
+    {
+        public void main()
+        {
+            
+            // Create an instance of the API class
+            var apiInstance = new MessageApi();
+            var id = 789;  // Long | Message Id (default to null)
+
+            try {
+                Message result = apiInstance.messageGetById(id);
+                Debug.WriteLine(result);
+            } catch (Exception e) {
+                Debug.Print("Exception when calling MessageApi.messageGetById: " + e.Message );
+            }
+        }
+    }
+}
+</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageGetById-0-php">
+                              <pre class="prettyprint"><code class="language-php"><&#63;php
+require_once(__DIR__ . '/vendor/autoload.php');
+
+// Create an instance of the API class
+$api_instance = new OpenAPITools\Client\Api\MessageApi();
+$id = 789; // Long | Message Id
+
+try {
+    $result = $api_instance->messageGetById($id);
+    print_r($result);
+} catch (Exception $e) {
+    echo 'Exception when calling MessageApi->messageGetById: ', $e->getMessage(), PHP_EOL;
+}
+?></code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageGetById-0-perl">
+                              <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
+use WWW::OPenAPIClient::Configuration;
+use WWW::OPenAPIClient::MessageApi;
+
+# Create an instance of the API class
+my $api_instance = WWW::OPenAPIClient::MessageApi->new();
+my $id = 789; # Long | Message Id
+
+eval { 
+    my $result = $api_instance->messageGetById(id => $id);
+    print Dumper($result);
+};
+if ($@) {
+    warn "Exception when calling MessageApi->messageGetById: $@\n";
+}</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageGetById-0-python">
+                              <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
+import time
+import openapi_client
+from openapi_client.rest import ApiException
+from pprint import pprint
+
+# Create an instance of the API class
+api_instance = openapi_client.MessageApi()
+id = 789 # Long | Message Id (default to null)
+
+try: 
+    api_response = api_instance.message_get_by_id(id)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling MessageApi->messageGetById: %s\n" % e)</code></pre>
+                            </div>
+
+                            <div class="tab-pane" id="examples-Message-messageGetById-0-rust">
+                              <pre class="prettyprint"><code class="language-rust">extern crate MessageApi;
+
+pub fn main() {
+    let id = 789; // Long
+
+    let mut context = MessageApi::Context::default();
+    let result = client.messageGetById(id, &context).wait();
+
+    println!("{:?}", result);
+}
+</code></pre>
+                            </div>
+                          </div>
+
+                          <h2>Scopes</h2>
+                          <table>
+                            
+                          </table>
+
+                          <h2>Parameters</h2>
+
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+<td>
+
+
+    <div id="d2e199_messageGetById_id">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Long
+                </span>
+                    <span class="format">
+                        (int64)
+                    </span>
+
+                    <div class="inner description marked">
+Message Id
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
+
+
+
+
+
+                          <h2>Responses</h2>
+                            <h3 id="examples-Message-messageGetById-title-200"></h3>
+                            <p id="examples-Message-messageGetById-description-200" class="marked"></p>
+                            <script>
+                              var responseMessage200_description = `Successful operation`;
+                              var responseMessage200_description_break = responseMessage200_description.indexOf('\n');
+                              if (responseMessage200_description_break == -1) {
+                                $("#examples-Message-messageGetById-title-200").text("Status: 200 - " + responseMessage200_description);
+                              } else {
+                                $("#examples-Message-messageGetById-title-200").text("Status: 200 - " + responseMessage200_description.substring(0, responseMessage200_description_break));
+                                $("#examples-Message-messageGetById-description-200").html(responseMessage200_description.substring(responseMessage200_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Message-messageGetById-200" class="nav nav-tabs nav-tabs-examples" >
                                 <li class="active">
-                                  <a data-toggle="tab" href="#responses-Message-messagesIdGet-200-schema">Schema</a>
+                                  <a data-toggle="tab" href="#responses-Message-messageGetById-200-schema">Schema</a>
                                 </li>
 
 
 
                                 <li class="">
-                                  <a data-toggle="tab" href="#responses-messagesIdGet-200-headers">Headers</a>
+                                  <a data-toggle="tab" href="#responses-messageGetById-200-headers">Headers</a>
                                 </li>
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Message-messagesIdGet-200-wrapper" style='margin-bottom: 10px;'>
-                                <div class="tab-pane active" id="responses-Message-messagesIdGet-200-schema">
-                                  <div id="responses-Message-messagesIdGet-schema-200" class="exampleStyle">
+                            <div class="tab-content" id="responses-Message-messageGetById-200-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Message-messageGetById-200-schema">
+                                  <div id="responses-Message-messageGetById-schema-200" class="exampleStyle">
                                     <script>
                                       $(document).ready(function() {
                                         var schemaWrapper = {
@@ -1601,16 +2312,16 @@ Message Id
                                         }
 
                                         var view = new JSONSchemaView(schema, 3);
-                                        $('#responses-Message-messagesIdGet-200-schema-data').val(JSON.stringify(schema));
-                                        var result = $('#responses-Message-messagesIdGet-schema-200');
+                                        $('#responses-Message-messageGetById-200-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Message-messageGetById-schema-200');
                                         result.empty();
                                         result.append(view.render());
                                       });
                                     </script>
                                   </div>
-                                  <input id='responses-Message-messagesIdGet-200-schema-data' type='hidden' value=''></input>
+                                  <input id='responses-Message-messageGetById-200-schema-data' type='hidden' value=''></input>
                                 </div>
-                                  <div class="tab-pane" id="responses-messagesIdGet-200-headers">
+                                  <div class="tab-pane" id="responses-messageGetById-200-headers">
                                       <table>
                                           <tr>
                                               <th width="150px">Name</th>
@@ -1633,46 +2344,70 @@ Message Id
                                       </table>
                                   </div>
                             </div>
+                            <h3 id="examples-Message-messageGetById-title-404"></h3>
+                            <p id="examples-Message-messageGetById-description-404" class="marked"></p>
+                            <script>
+                              var responseMessage404_description = `Returned if the message with the specified id cannot be found.`;
+                              var responseMessage404_description_break = responseMessage404_description.indexOf('\n');
+                              if (responseMessage404_description_break == -1) {
+                                $("#examples-Message-messageGetById-title-404").text("Status: 404 - " + responseMessage404_description);
+                              } else {
+                                $("#examples-Message-messageGetById-title-404").text("Status: 404 - " + responseMessage404_description.substring(0, responseMessage404_description_break));
+                                $("#examples-Message-messageGetById-description-404").html(responseMessage404_description.substring(responseMessage404_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Message-messageGetById-404" class="nav nav-tabs nav-tabs-examples" >
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Message-messageGetById-404-wrapper" style='margin-bottom: 10px;'>
+                            </div>
                         </article>
                       </div>
                       <hr>
-                    <div id="api-Message-messagesPost">
-                      <article id="api-Message-messagesPost-0" data-group="User" data-name="messagesPost" data-version="0">
+                    <div id="api-Message-messageUpdateById">
+                      <article id="api-Message-messageUpdateById-0" data-group="User" data-name="messageUpdateById" data-version="0">
                         <div class="pull-left">
-                          <h1>messagesPost</h1>
+                          <h1>messageUpdateById</h1>
                           <p></p>
                         </div>
                         <div class="pull-right"></div>
                         <div class="clearfix"></div>
                         <p></p>
-                        <p class="marked">Create a new message.</p>
+                        <p class="marked">Update a message.</p>
                         <p></p>
                         <br />
-                        <pre class="prettyprint language-html prettyprinted" data-type="post"><code><span class="pln">/messages</span></code></pre>
+                        <pre class="prettyprint language-html prettyprinted" data-type="put"><code><span class="pln">/messages/{id}</span></code></pre>
                         <p>
                           <h3>Usage and SDK Samples</h3>
                         </p>
                         <ul class="nav nav-tabs nav-tabs-examples">
-                          <li class="active"><a href="#examples-Message-messagesPost-0-curl">Curl</a></li>
-                          <li class=""><a href="#examples-Message-messagesPost-0-java">Java</a></li>
-                          <li class=""><a href="#examples-Message-messagesPost-0-android">Android</a></li>
-                          <!--<li class=""><a href="#examples-Message-messagesPost-0-groovy">Groovy</a></li>-->
-                          <li class=""><a href="#examples-Message-messagesPost-0-objc">Obj-C</a></li>
-                          <li class=""><a href="#examples-Message-messagesPost-0-javascript">JavaScript</a></li>
-                          <!--<li class=""><a href="#examples-Message-messagesPost-0-angular">Angular</a></li>-->
-                          <li class=""><a href="#examples-Message-messagesPost-0-csharp">C#</a></li>
-                          <li class=""><a href="#examples-Message-messagesPost-0-php">PHP</a></li>
-                          <li class=""><a href="#examples-Message-messagesPost-0-perl">Perl</a></li>
-                          <li class=""><a href="#examples-Message-messagesPost-0-python">Python</a></li>
-                          <li class=""><a href="#examples-Message-messagesPost-0-rust">Rust</a></li>
+                          <li class="active"><a href="#examples-Message-messageUpdateById-0-curl">Curl</a></li>
+                          <li class=""><a href="#examples-Message-messageUpdateById-0-java">Java</a></li>
+                          <li class=""><a href="#examples-Message-messageUpdateById-0-android">Android</a></li>
+                          <!--<li class=""><a href="#examples-Message-messageUpdateById-0-groovy">Groovy</a></li>-->
+                          <li class=""><a href="#examples-Message-messageUpdateById-0-objc">Obj-C</a></li>
+                          <li class=""><a href="#examples-Message-messageUpdateById-0-javascript">JavaScript</a></li>
+                          <!--<li class=""><a href="#examples-Message-messageUpdateById-0-angular">Angular</a></li>-->
+                          <li class=""><a href="#examples-Message-messageUpdateById-0-csharp">C#</a></li>
+                          <li class=""><a href="#examples-Message-messageUpdateById-0-php">PHP</a></li>
+                          <li class=""><a href="#examples-Message-messageUpdateById-0-perl">Perl</a></li>
+                          <li class=""><a href="#examples-Message-messageUpdateById-0-python">Python</a></li>
+                          <li class=""><a href="#examples-Message-messageUpdateById-0-rust">Rust</a></li>
                         </ul>
 
                         <div class="tab-content">
-                          <div class="tab-pane active" id="examples-Message-messagesPost-0-curl">
-                            <pre class="prettyprint"><code class="language-bsh">curl -X POST\
- "http://localhost:8000/messages"</code></pre>
+                          <div class="tab-pane active" id="examples-Message-messageUpdateById-0-curl">
+                            <pre class="prettyprint"><code class="language-bsh">curl -X PUT\
+ -H "Accept: application/json"\
+ -H "Content-Type: application/json"\
+ "http://localhost:8000/messages/{id}"</code></pre>
                           </div>
-                          <div class="tab-pane" id="examples-Message-messagesPost-0-java">
+                          <div class="tab-pane" id="examples-Message-messageUpdateById-0-java">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.*;
 import org.openapitools.client.auth.*;
 import org.openapitools.client.model.*;
@@ -1686,11 +2421,13 @@ public class MessageApiExample {
         
         // Create an instance of the API class
         MessageApi apiInstance = new MessageApi();
+        Long id = 789; // Long | Message Id
+        MessageModify messageModify = ; // MessageModify | 
         
         try {
-            apiInstance.messagesPost();
+            apiInstance.messageUpdateById(id, messageModify);
         } catch (ApiException e) {
-            System.err.println("Exception when calling MessageApi#messagesPost");
+            System.err.println("Exception when calling MessageApi#messageUpdateById");
             e.printStackTrace();
         }
     }
@@ -1698,34 +2435,39 @@ public class MessageApiExample {
 </code></pre>
                           </div>
 
-                          <div class="tab-pane" id="examples-Message-messagesPost-0-android">
+                          <div class="tab-pane" id="examples-Message-messageUpdateById-0-android">
                             <pre class="prettyprint"><code class="language-java">import org.openapitools.client.api.MessageApi;
 
 public class MessageApiExample {
     public static void main(String[] args) {
         MessageApi apiInstance = new MessageApi();
+        Long id = 789; // Long | Message Id
+        MessageModify messageModify = ; // MessageModify | 
         
         try {
-            apiInstance.messagesPost();
+            apiInstance.messageUpdateById(id, messageModify);
         } catch (ApiException e) {
-            System.err.println("Exception when calling MessageApi#messagesPost");
+            System.err.println("Exception when calling MessageApi#messageUpdateById");
             e.printStackTrace();
         }
     }
 }</code></pre>
                           </div>
   <!--
-  <div class="tab-pane" id="examples-Message-messagesPost-0-groovy">
+  <div class="tab-pane" id="examples-Message-messageUpdateById-0-groovy">
   <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
   </div> -->
-                            <div class="tab-pane" id="examples-Message-messagesPost-0-objc">
+                            <div class="tab-pane" id="examples-Message-messageUpdateById-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">
 
 // Create an instance of the API class
 MessageApi *apiInstance = [[MessageApi alloc] init];
+Long *id = 789; // Message Id (default to null)
+MessageModify *messageModify = ; //  (optional)
 
-[apiInstance messagesPostWithCompletionHandler: 
-              ^(NSError* error) {
+[apiInstance messageUpdateByIdWith:id
+    messageModify:messageModify
+              completionHandler: ^(NSError* error) {
     if (error) {
         NSLog(@"Error: %@", error);
     }
@@ -1733,11 +2475,16 @@ MessageApi *apiInstance = [[MessageApi alloc] init];
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesPost-0-javascript">
+                            <div class="tab-pane" id="examples-Message-messageUpdateById-0-javascript">
                               <pre class="prettyprint"><code class="language-js">var Title = require('title');
 
 // Create an instance of the API class
 var api = new Title.MessageApi()
+var id = 789; // {Long} Message Id
+var opts = {
+  'messageModify':  // {MessageModify} 
+};
+
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -1745,14 +2492,14 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-api.messagesPost(callback);
+api.messageUpdateById(id, opts, callback);
 </code></pre>
                             </div>
 
-                            <!--<div class="tab-pane" id="examples-Message-messagesPost-0-angular">
+                            <!--<div class="tab-pane" id="examples-Message-messageUpdateById-0-angular">
               <pre class="prettyprint language-json prettyprinted" data-type="json"><code>Coming Soon!</code></pre>
             </div>-->
-                            <div class="tab-pane" id="examples-Message-messagesPost-0-csharp">
+                            <div class="tab-pane" id="examples-Message-messageUpdateById-0-csharp">
                               <pre class="prettyprint"><code class="language-cs">using System;
 using System.Diagnostics;
 using Org.OpenAPITools.Api;
@@ -1761,18 +2508,20 @@ using Org.OpenAPITools.Model;
 
 namespace Example
 {
-    public class messagesPostExample
+    public class messageUpdateByIdExample
     {
         public void main()
         {
             
             // Create an instance of the API class
             var apiInstance = new MessageApi();
+            var id = 789;  // Long | Message Id (default to null)
+            var messageModify = new MessageModify(); // MessageModify |  (optional) 
 
             try {
-                apiInstance.messagesPost();
+                apiInstance.messageUpdateById(id, messageModify);
             } catch (Exception e) {
-                Debug.Print("Exception when calling MessageApi.messagesPost: " + e.Message );
+                Debug.Print("Exception when calling MessageApi.messageUpdateById: " + e.Message );
             }
         }
     }
@@ -1780,38 +2529,42 @@ namespace Example
 </code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesPost-0-php">
+                            <div class="tab-pane" id="examples-Message-messageUpdateById-0-php">
                               <pre class="prettyprint"><code class="language-php"><&#63;php
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Create an instance of the API class
 $api_instance = new OpenAPITools\Client\Api\MessageApi();
+$id = 789; // Long | Message Id
+$messageModify = ; // MessageModify | 
 
 try {
-    $api_instance->messagesPost();
+    $api_instance->messageUpdateById($id, $messageModify);
 } catch (Exception $e) {
-    echo 'Exception when calling MessageApi->messagesPost: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling MessageApi->messageUpdateById: ', $e->getMessage(), PHP_EOL;
 }
 ?></code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesPost-0-perl">
+                            <div class="tab-pane" id="examples-Message-messageUpdateById-0-perl">
                               <pre class="prettyprint"><code class="language-perl">use Data::Dumper;
 use WWW::OPenAPIClient::Configuration;
 use WWW::OPenAPIClient::MessageApi;
 
 # Create an instance of the API class
 my $api_instance = WWW::OPenAPIClient::MessageApi->new();
+my $id = 789; # Long | Message Id
+my $messageModify = WWW::OPenAPIClient::Object::MessageModify->new(); # MessageModify | 
 
 eval { 
-    $api_instance->messagesPost();
+    $api_instance->messageUpdateById(id => $id, messageModify => $messageModify);
 };
 if ($@) {
-    warn "Exception when calling MessageApi->messagesPost: $@\n";
+    warn "Exception when calling MessageApi->messageUpdateById: $@\n";
 }</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesPost-0-python">
+                            <div class="tab-pane" id="examples-Message-messageUpdateById-0-python">
                               <pre class="prettyprint"><code class="language-python">from __future__ import print_statement
 import time
 import openapi_client
@@ -1820,20 +2573,24 @@ from pprint import pprint
 
 # Create an instance of the API class
 api_instance = openapi_client.MessageApi()
+id = 789 # Long | Message Id (default to null)
+messageModify =  # MessageModify |  (optional)
 
 try: 
-    api_instance.messages_post()
+    api_instance.message_update_by_id(id, messageModify=messageModify)
 except ApiException as e:
-    print("Exception when calling MessageApi->messagesPost: %s\n" % e)</code></pre>
+    print("Exception when calling MessageApi->messageUpdateById: %s\n" % e)</code></pre>
                             </div>
 
-                            <div class="tab-pane" id="examples-Message-messagesPost-0-rust">
+                            <div class="tab-pane" id="examples-Message-messageUpdateById-0-rust">
                               <pre class="prettyprint"><code class="language-rust">extern crate MessageApi;
 
 pub fn main() {
+    let id = 789; // Long
+    let messageModify = ; // MessageModify
 
     let mut context = MessageApi::Context::default();
-    let result = client.messagesPost(&context).wait();
+    let result = client.messageUpdateById(id, messageModify, &context).wait();
 
     println!("{:?}", result);
 }
@@ -1848,37 +2605,115 @@ pub fn main() {
 
                           <h2>Parameters</h2>
 
+                            <div class="methodsubtabletitle">Path parameters</div>
+                            <table id="methodsubtable">
+                                <tr>
+                                  <th width="150px">Name</th>
+                                  <th>Description</th>
+                                </tr>
+                                  <tr><td style="width:150px;">id*</td>
+<td>
 
 
+    <div id="d2e199_messageUpdateById_id">
+        <div class="json-schema-view">
+            <div class="primitive">
+                <span class="type">
+                    Long
+                </span>
+                    <span class="format">
+                        (int64)
+                    </span>
+
+                    <div class="inner description marked">
+Message Id
+                    </div>
+            </div>
+                <div class="inner required">
+                    Required
+                </div>
+        </div>
+    </div>
+</td>
+</tr>
+
+                            </table>
+
+
+                            <div class="methodsubtabletitle">Body parameters</div>
+                            <table id="methodsubtable">
+                              <tr>
+                                <th width="150px">Name</th>
+                                <th>Description</th>
+                              </tr>
+                                <tr><td style="width:150px;">messageModify </td>
+<td>
+<p class="marked"></p>
+<script>
+$(document).ready(function() {
+  var schemaWrapper = {
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/MessageModify"
+      }
+    }
+  }
+};
+
+  var schema = findNode('schema',schemaWrapper).schema;
+  if (!schema) {
+    schema = schemaWrapper.schema;
+  }
+  if (schema.$ref != null) {
+    schema = defsParser.$refs.get(schema.$ref);
+  } else {
+    schemaWrapper.definitions = Object.assign({}, defs);
+    $RefParser.dereference(schemaWrapper).catch(function(err) {
+      console.log(err);
+    });
+  }
+
+  var view = new JSONSchemaView(schema,2,{isBodyParam: true});
+  var result = $('#d2e199_messageUpdateById_messageModify');
+  result.empty();
+  result.append(view.render());
+});
+</script>
+<div id="d2e199_messageUpdateById_messageModify"></div>
+</td>
+</tr>
+
+                            </table>
 
 
 
                           <h2>Responses</h2>
-                            <h3 id="examples-Message-messagesPost-title-201"></h3>
-                            <p id="examples-Message-messagesPost-description-201" class="marked"></p>
+                            <h3 id="examples-Message-messageUpdateById-title-200"></h3>
+                            <p id="examples-Message-messageUpdateById-description-200" class="marked"></p>
                             <script>
-                              var responseMessage201_description = `Indicates the message was created successfully.`;
-                              var responseMessage201_description_break = responseMessage201_description.indexOf('\n');
-                              if (responseMessage201_description_break == -1) {
-                                $("#examples-Message-messagesPost-title-201").text("Status: 201 - " + responseMessage201_description);
+                              var responseMessage200_description = `Indicates the message was updated successfully.`;
+                              var responseMessage200_description_break = responseMessage200_description.indexOf('\n');
+                              if (responseMessage200_description_break == -1) {
+                                $("#examples-Message-messageUpdateById-title-200").text("Status: 200 - " + responseMessage200_description);
                               } else {
-                                $("#examples-Message-messagesPost-title-201").text("Status: 201 - " + responseMessage201_description.substring(0, responseMessage201_description_break));
-                                $("#examples-Message-messagesPost-description-201").html(responseMessage201_description.substring(responseMessage201_description_break));
+                                $("#examples-Message-messageUpdateById-title-200").text("Status: 200 - " + responseMessage200_description.substring(0, responseMessage200_description_break));
+                                $("#examples-Message-messageUpdateById-description-200").html(responseMessage200_description.substring(responseMessage200_description_break));
                               }
                             </script>
 
 
-                            <ul id="responses-detail-Message-messagesPost-201" class="nav nav-tabs nav-tabs-examples" >
+                            <ul id="responses-detail-Message-messageUpdateById-200" class="nav nav-tabs nav-tabs-examples" >
 
                                 <li class="">
-                                  <a data-toggle="tab" href="#responses-messagesPost-201-headers">Headers</a>
+                                  <a data-toggle="tab" href="#responses-messageUpdateById-200-headers">Headers</a>
                                 </li>
 
                             </ul>
 
 
-                            <div class="tab-content" id="responses-Message-messagesPost-201-wrapper" style='margin-bottom: 10px;'>
-                                  <div class="tab-pane" id="responses-messagesPost-201-headers">
+                            <div class="tab-content" id="responses-Message-messageUpdateById-200-wrapper" style='margin-bottom: 10px;'>
+                                  <div class="tab-pane" id="responses-messageUpdateById-200-headers">
                                       <table>
                                           <tr>
                                               <th width="150px">Name</th>
@@ -1887,13 +2722,79 @@ pub fn main() {
                                               <th>Description</th>
                                           </tr>
                                               <tr>
-                                                  <td>Location</td>
-                                                  <td>String</td>
-                                                  <td></td>
-                                                  <td>Path to the newly created message</td>
+                                                  <td>ETag</td>
+                                                  <td>Long</td>
+                                                  <td>int64</td>
+                                                  <td>Returns the current version number for the message.</td>
                                               </tr>
                                       </table>
                                   </div>
+                            </div>
+                            <h3 id="examples-Message-messageUpdateById-title-400"></h3>
+                            <p id="examples-Message-messageUpdateById-description-400" class="marked"></p>
+                            <script>
+                              var responseMessage400_description = `Returned if an error occurred while processing the request.`;
+                              var responseMessage400_description_break = responseMessage400_description.indexOf('\n');
+                              if (responseMessage400_description_break == -1) {
+                                $("#examples-Message-messageUpdateById-title-400").text("Status: 400 - " + responseMessage400_description);
+                              } else {
+                                $("#examples-Message-messageUpdateById-title-400").text("Status: 400 - " + responseMessage400_description.substring(0, responseMessage400_description_break));
+                                $("#examples-Message-messageUpdateById-description-400").html(responseMessage400_description.substring(responseMessage400_description_break));
+                              }
+                            </script>
+
+
+                            <ul id="responses-detail-Message-messageUpdateById-400" class="nav nav-tabs nav-tabs-examples" >
+                                <li class="active">
+                                  <a data-toggle="tab" href="#responses-Message-messageUpdateById-400-schema">Schema</a>
+                                </li>
+
+
+
+
+                            </ul>
+
+
+                            <div class="tab-content" id="responses-Message-messageUpdateById-400-wrapper" style='margin-bottom: 10px;'>
+                                <div class="tab-pane active" id="responses-Message-messageUpdateById-400-schema">
+                                  <div id="responses-Message-messageUpdateById-schema-400" class="exampleStyle">
+                                    <script>
+                                      $(document).ready(function() {
+                                        var schemaWrapper = {
+  "description" : "Returned if an error occurred while processing the request.",
+  "content" : {
+    "application/json" : {
+      "schema" : {
+        "$ref" : "#/components/schemas/ErrorResponse"
+      }
+    }
+  }
+};
+                                        var schema = findNode('schema',schemaWrapper).schema;
+                                        if (!schema) {
+                                          schema = schemaWrapper.schema;
+                                        }
+                                        if (schema.$ref != null) {
+                                          schema = defsParser.$refs.get(schema.$ref);
+                                        } else if (schema.items != null && schema.items.$ref != null) {
+                                            schema.items = defsParser.$refs.get(schema.items.$ref);
+                                        } else {
+                                          schemaWrapper.definitions = Object.assign({}, defs);
+                                          $RefParser.dereference(schemaWrapper).catch(function(err) {
+                                            console.log(err);
+                                          });
+                                        }
+
+                                        var view = new JSONSchemaView(schema, 3);
+                                        $('#responses-Message-messageUpdateById-400-schema-data').val(JSON.stringify(schema));
+                                        var result = $('#responses-Message-messageUpdateById-schema-400');
+                                        result.empty();
+                                        result.append(view.render());
+                                      });
+                                    </script>
+                                  </div>
+                                  <input id='responses-Message-messageUpdateById-400-schema-data' type='hidden' value=''></input>
+                                </div>
                             </div>
                         </article>
                       </div>

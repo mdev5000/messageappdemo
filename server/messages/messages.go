@@ -38,6 +38,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	handler.SetETagInt(w, 1) // The first created version is always version 1.
 	w.Header().Set("Location", uris.Message(id))
 	w.WriteHeader(http.StatusCreated)
 }
@@ -74,7 +75,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := h.messagesSvc.Update(id, resp.toModifyMessage())
+	newVersion, err := h.messagesSvc.Update(id, resp.toModifyMessage())
 	if err != nil {
 		if errors.Is(err, messages.IdMissingError{}) {
 			w.WriteHeader(http.StatusNotFound)
@@ -83,6 +84,8 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		handler.SendErrorResponse(h.log, op, w, err)
 		return
 	}
+
+	handler.SetETagInt(w, newVersion)
 }
 
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {

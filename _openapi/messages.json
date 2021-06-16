@@ -14,23 +14,55 @@
     "/messages": {
       "summary": "Create or view all messages.",
       "post": {
+        "operationId": "messageCreate",
         "description": "Create a new message.",
         "tags": [
           "Message"
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageModify"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "headers": {
               "Location": {
                 "description": "Path to the newly created message",
-                "example": "/messages/2"
+                "example": "/messages/2",
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              },
+              "ETag": {
+                "description": "Returns the current version number for the message.",
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
               }
             },
             "description": "Indicates the message was created successfully."
+          },
+          "400": {
+            "description": "Returned if an error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
       "get": {
+        "operationId": "messageList",
         "description": "List all or a subset of existing messages",
         "responses": {
           "200": {
@@ -48,21 +80,23 @@
     },
     "/messages/{id}": {
       "summary": "Read, update, or delete a message.",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "Message Id",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      ],
       "get": {
+        "operationId": "messageGetById",
+        "description": "Retrieve an existing message.",
         "tags": [
           "Message"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Message Id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
         ],
         "responses": {
           "200": {
@@ -82,6 +116,61 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Returned if the message with the specified id cannot be found."
+          }
+        }
+      },
+      "put": {
+        "operationId": "messageUpdateById",
+        "description": "Update a message.",
+        "tags": [
+          "Message"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageModify"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Indicates the message was updated successfully.",
+            "headers": {
+              "ETag": {
+                "description": "Returns the current version number for the message.",
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Returned if an error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "messageDeleteById",
+        "description": "Delete a message.",
+        "tags": [
+          "Message"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returned when either the message was deleted or it did not exist."
           }
         }
       }
@@ -145,14 +234,44 @@
             "type": "integer"
           },
           "createdAt": {
-            "description": "Time the message was first created",
+            "description": "Time the message was first created.",
             "type": "string",
             "format": "timestamp"
           },
           "updatedAt": {
-            "description": "Time the message was last updated",
+            "description": "Time the message was last updated.",
             "type": "string",
             "format": "timestamp"
+          }
+        }
+      },
+      "MessageModify": {
+        "description": "Fields for creating or updating a message.",
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "description": "The message text to post.",
+            "type": "string",
+            "format": "string"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "description": "Returns a description of the error that occurred.",
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "description": "A list of errors that occurred.",
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
           }
         }
       }

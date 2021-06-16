@@ -1,6 +1,8 @@
 .openapi-generator-ignore
 Apis/DefaultApi.md
 Apis/MessageApi.md
+Models/ErrorResponse.md
 Models/Message.md
+Models/MessageModify.md
 Models/SelectedMessage.md
 README.md
