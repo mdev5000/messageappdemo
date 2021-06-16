@@ -24,10 +24,25 @@ type Config struct {
 	LogRequest bool
 }
 
+const MaxBodySize = 2 * 1024 * 1024 // 2MB
+
+func addSecureHeaders(w http.ResponseWriter) {
+	w.Header().Add("X-Frame-Options", "deny")
+	w.Header().Add("X-Content-Type-Options", "nosniff")
+	w.Header().Add("Content-Security-Policy", "frame-ancestors 'none'")
+}
+
 func standardServiceMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// This service only accepts json, so indicate to the client.
 		w.Header().Set("Accept", "application/json")
+
+		addSecureHeaders(w)
+
+		// Limit max body size
+		// This will return an 'http: request body too large' if body is too large, so need to check for this when
+		// processing the body later in the pipeline.
+		r.Body = http.MaxBytesReader(w, r.Body, MaxBodySize)
 
 		// Ensure the content type is correctly set to json
 		switch r.Method {

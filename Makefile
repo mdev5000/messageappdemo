@@ -70,6 +70,10 @@ test:
 test.nodb:
 	NODB=1 go test ./...
 
+# Run property based tests, note this can take a while.
+test.prop:
+	go test --tags=propertyTests ./messages
+
 # Print code coverage.
 cover:
 	go test -cover ./...

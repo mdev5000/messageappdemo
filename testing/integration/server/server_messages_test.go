@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	msgs "github.com/mdev5000/qlik_message/messages"
+	"github.com/mdev5000/qlik_message/server"
 	"github.com/mdev5000/qlik_message/server/handler"
 	"github.com/mdev5000/qlik_message/server/messages"
 	"github.com/mdev5000/qlik_message/server/uris"
@@ -12,6 +13,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -324,7 +326,7 @@ func TestMessages_OptionsMethodAndReturns405WhenMethodIsNotSupported(t *testing.
 	}
 }
 
-func TestMessages_HeadRequests(t *testing.T) {
+func TestMessages_headRequests(t *testing.T) {
 	db, dbClose := acquireDb(t)
 	defer dbClose()
 
@@ -347,6 +349,59 @@ func TestMessages_HeadRequests(t *testing.T) {
 			require.Equal(t, "", rr.Body.String())
 		})
 	}
+}
+
+func TestMessages_406NotAcceptableWhenInvalidContentType(t *testing.T) {
+	t.Parallel()
+	h := noDbHandler(t)
+
+	cases := []struct {
+		method      string
+		uri         string
+		contentType string
+		body        string
+	}{
+		{"POST", "/messages", "application/xml", "<xml></xml>"},
+		{"PUT", uris.Message(5), "application/xml", "<xml></xml>"},
+	}
+	for _, c := range cases {
+		t.Run(c.method+" "+c.uri+" content type: "+c.contentType, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			req := requestString(t, c.method, c.uri, c.body)
+			req.Header.Set("Content-Type", c.contentType)
+			h.ServeHTTP(rr, req)
+			require.Equal(t, http.StatusNotAcceptable, rr.Code)
+			require.Equal(t, "application/json", rr.Header().Get("Accept"))
+		})
+	}
+}
+
+// * - /messages/{id} (security)
+// --------------------------------------------
+
+func TestMessages_secureHeadersApplied(t *testing.T) {
+	t.Parallel()
+	rr := httptest.NewRecorder()
+	// These headers are currently applied to all paths so just check that they are there.
+	noDbServe(t, rr, requestEmpty(t, "DELETE", uris.Message(7)))
+	require.Equal(t, "deny", rr.Header().Get("X-Frame-Options"))
+	require.Equal(t, "nosniff", rr.Header().Get("X-Content-Type-Options"))
+	require.Equal(t, "frame-ancestors 'none'", rr.Header().Get("Content-Security-Policy"))
+}
+
+func TestMessages_errorWhenRequestBodyIsTooBig(t *testing.T) {
+	t.Parallel()
+	rr := httptest.NewRecorder()
+	// This setting is applied to all paths so just check it exists.
+	size := server.MaxBodySize + 1
+	body := make([]byte, size)
+	// Make sure the start is valid json.
+	n := copy(body, `{"message": "long"`)
+	copy(body[n:], strings.Repeat(" ", size-n-1))
+	body[len(body)-1] = '}'
+	noDbServe(t, rr, request(t, "POST", "/messages", bytes.NewBuffer(body)))
+	require.Equal(t, http.StatusBadRequest, rr.Code)
+	require.Equal(t, `{"errors":[{"error":"request body too large"}]}`+"\n", rr.Body.String())
 }
 
 // helpers

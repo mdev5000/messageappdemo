@@ -20,6 +20,7 @@ func TestIsPalindrome(t *testing.T) {
 		{"word: ducks", "ducks", false},
 		{"word: atttta", "atttta", true},
 	}
+
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			require.Equal(t, c.expected, isPalindrome(c.value))

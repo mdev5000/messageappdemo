@@ -4,7 +4,15 @@ import (
 	"time"
 )
 
-const NoOp = 0
+const (
+	NoOp = 0
+
+	// MaxMessageCharLength is the maximum number of characters a string can contain. Note this is characters not bytes
+	// so max bytes would be MaxMessageCharLength * 4 for UTC strings. Also extended grapheme clusters will count as
+	// multiple characters (ex. "🤦🏼‍♂️", paste into https://fsymbols.com/emoticons/maker/ to understand).
+	// Also see https://hsivonen.fi/string-length/.
+	MaxMessageCharLength = 512
+)
 
 type Field = string
 

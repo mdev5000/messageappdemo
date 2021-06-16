@@ -21,6 +21,12 @@ func DecodeJsonOrError(log *logging.Logger, op string, w http.ResponseWriter, r 
 	}
 	d := json.NewDecoder(r.Body)
 	if err := d.Decode(v); err != nil {
+		if err.Error() == "http: request body too large" {
+			appErr := apperrors.Error{Op: op, EType: apperrors.ETInvalid, Err: err, Stack: errors.WithStack(err)}
+			appErr.AddResponse(apperrors.ErrorResponse("request body too large"))
+			SendErrorResponse(log, op, w, &appErr)
+			return false
+		}
 		appErr := apperrors.Error{Op: op, EType: apperrors.ETInvalid, Err: err, Stack: errors.WithStack(err)}
 		appErr.AddResponse(apperrors.ErrorResponse("invalid json"))
 		SendErrorResponse(log, op, w, &appErr)

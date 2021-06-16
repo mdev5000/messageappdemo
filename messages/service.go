@@ -21,7 +21,7 @@ func NewService(log *logging.Logger, repo Repository) *Service {
 func (ms *Service) Create(message ModifyMessage) (MessageId, error) {
 	const op = "MessagesService.Create"
 
-	if err := validateMessage(message, op); err != nil {
+	if err := validateMessage(op, message); err != nil {
 		return NoOp, err
 	}
 
@@ -55,7 +55,7 @@ func (ms *Service) Delete(id MessageId) error {
 func (ms *Service) Update(id MessageId, message ModifyMessage) (MessageVersion, error) {
 	const op = "MessagesService.Update"
 
-	if err := validateMessage(message, op); err != nil {
+	if err := validateMessage(op, message); err != nil {
 		return NoOp, err
 	}
 

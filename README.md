@@ -5,8 +5,7 @@ and request information about the messages.
 
 ## Architecture
 
-@todo add arch doc.
-To understand the code architecture please view the document here.
+For details on the architecture please see [here](./_docs/arch/README.md).
 
 ---
 
@@ -99,6 +98,13 @@ tooling.
 
 ```bash
 go test ./data # run tests for the data package
+```
+
+You can include property based tests by adding the `propertyTests` build tag and specify the number of cases via 
+`NUM_PROP_TESTS`, ex:
+
+```bash
+NUM_PROP_TESTS=20000 go test --tags=propertyTests ./messages
 ```
 
 ### Coverage

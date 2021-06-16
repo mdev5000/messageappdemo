@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/Masterminds/squirrel v1.5.0
+	github.com/chrismcguire/gobberish v0.0.0-20150821175641-1d8adb509a0e
 	github.com/davecgh/go-spew v1.1.1
 	github.com/gorilla/mux v1.8.0
 	github.com/jmoiron/sqlx v1.3.4
