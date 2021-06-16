@@ -3,9 +3,15 @@
 A REST service that allows clients to create and modify messages 
 and request information about the messages.
 
-## Architecture
+## Architecture + Docs
 
 For details on the architecture please see [here](./_docs/arch/README.md).
+
+For Go documentation run:
+
+```bash
+make docs
+```
 
 ---
 

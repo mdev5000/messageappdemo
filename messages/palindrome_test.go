@@ -31,6 +31,15 @@ func TestIsPalindrome(t *testing.T) {
 func TestIsPalindrome_lettersFollowedByCombiningCharactersAreStillPalindromes(t *testing.T) {
 	// u0301 is a combining character which adds an accent. So this string is equivalent to "éé".
 	// However is would need to be normalized to NFC for it to be recognized as a palindrome.
-	s := "\u0065\u0301\u0065\u0301"
-	require.True(t, isPalindrome(s))
+	require.True(t, isPalindrome("\u0065\u0301\u0065\u0301"))
+}
+
+func TestIsPalindrome_extendedGraphemeClustersAreNotPalindromes(t *testing.T) {
+	// see IsPalindrome docs for details.
+	//lint:ignore ST1018 copied to display an emoji
+	require.False(t, isPalindrome("🤦🏼‍♂️"))
+}
+
+func TestIsPalindrome_hiddenCharactersAreNotRemoved(t *testing.T) {
+	require.False(t, isPalindrome("mee\u200Bm"))
 }

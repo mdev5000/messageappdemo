@@ -21,3 +21,12 @@ The application is architected as follows.
 | ------- | ----------- |
 | testing | Contains integration level tests. |
 | testutil | Contains utility packages for testing. |
+
+
+## Go docs
+
+To view the Go documentation run:
+
+```bash
+make docs
+```

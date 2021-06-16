@@ -1,3 +1,5 @@
+// Package logging contains core logging logic for the application. Currently mostly just a wrapper around the logrus
+// package.
 package logging
 
 import (
@@ -16,6 +18,8 @@ type Logger struct {
 	logrus.Logger
 }
 
+// LogFailedToEncode indicates if an application specific json struct failed to encode. Ideally you should never see
+// this logged.
 func (l *Logger) LogFailedToEncode(op string, origErr error, jsonErr error, stackErr error) {
 	l.WithFields(Fields{
 		"originalErr:": fmt.Sprintf("%+v", origErr),
@@ -24,6 +28,8 @@ func (l *Logger) LogFailedToEncode(op string, origErr error, jsonErr error, stac
 	}).Errorf("failed to encode error response (op: %s)", op)
 }
 
+// LogError an error from within the application. If the error is of type apperrors.Error then the information inside
+// is specially encoded into a log entry.
 func (l *Logger) LogError(err error) {
 	switch e := err.(type) {
 	case *apperrors.Error:

@@ -1,5 +1,4 @@
-// Package dbpool
-// A utility package for running database tests.
+// Package dbpool is a utility package for running database tests.
 package dbpool
 
 import (
@@ -13,6 +12,7 @@ const testDbUser = "pguser"
 const testDbPassword = "secret"
 const testDbName = "messagesdb"
 
+// DbPool manages test access to a database. Conceptually one or more, but currently only one.
 type DbPool struct {
 	SetupSchema      func(db *postgres.DB) error
 	PurgeDb          func(db *postgres.DB) error

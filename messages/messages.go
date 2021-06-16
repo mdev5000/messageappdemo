@@ -1,3 +1,4 @@
+// Package messages contains the core domain logic for Messages.
 package messages
 
 import (
@@ -5,7 +6,7 @@ import (
 )
 
 const (
-	NoOp = 0
+	noOp = 0
 
 	// MaxMessageCharLength is the maximum number of characters a string can contain. Note this is characters not bytes
 	// so max bytes would be MaxMessageCharLength * 4 for UTC strings. Also extended grapheme clusters will count as
@@ -68,6 +69,22 @@ type MessageQuery struct {
 	Offset uint64
 }
 
+// IsPalindrome determines is a Message is a palindrome.
+//
+// Implementation decisions
+//
+// Prior to determining if a message is a palindrome it is encoded into NFC, since the service doesn't strictly require
+// posted messages to be in NFC and pre-converting the message to NFC could confuse users when their text does not match
+// what was originally saved. The conversion is done at the time of palindrome testing. This allows letters with
+// combining characters to be treated as a single letter and allows for a more intuitive notion of what is a palindrome
+// (ex. éé).
+//
+// The implementation assumes extended grapheme clusters (ex. "🤦🏼‍♂️") are not palindromes. And more specifically
+// whether emojis are palindromes or not left largely undefined.
+//
+// There is no special handling for hidden characters. This may confuse users, so might be worth adjusting in the
+// future.
+//
 func IsPalindrome(msg *Message) bool {
 	return isPalindrome(msg.Message)
 }

@@ -1,3 +1,4 @@
+// Package server contains the main server logic for the application.
 package server
 
 import (

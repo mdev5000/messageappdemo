@@ -6,6 +6,8 @@ import (
 	"github.com/mdev5000/qlik_message/logging"
 )
 
+// Service is the primary interface between the domain and the outside layers of the application. All interaction with
+// this package should be done via this struct for non-domain packages (ex. server).
 type Service struct {
 	log  *logging.Logger
 	repo Repository
@@ -18,11 +20,12 @@ func NewService(log *logging.Logger, repo Repository) *Service {
 	}
 }
 
+// Create creates a new message. The message body cannot be empty and have a character limit of MaxMessageCharLength.
 func (ms *Service) Create(message ModifyMessage) (MessageId, error) {
 	const op = "MessagesService.Create"
 
 	if err := validateMessage(op, message); err != nil {
-		return NoOp, err
+		return noOp, err
 	}
 
 	now := nowUTC()
@@ -52,11 +55,12 @@ func (ms *Service) Delete(id MessageId) error {
 	return ms.repo.DeleteById(id)
 }
 
+// Update updates a message. The message body cannot be empty and have a character limit of MaxMessageCharLength.
 func (ms *Service) Update(id MessageId, message ModifyMessage) (MessageVersion, error) {
 	const op = "MessagesService.Update"
 
 	if err := validateMessage(op, message); err != nil {
-		return NoOp, err
+		return noOp, err
 	}
 
 	version, err := ms.repo.UpdateById(id, ModifyMessage{

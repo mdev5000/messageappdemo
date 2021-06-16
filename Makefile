@@ -11,10 +11,9 @@ precommit: fmt test.race.nocache cover lint
 # -------------------------------------------------------
 
 # Install all required dependencies that can reasonably be installed (ex. this will not install Docker).
-deps: deps.linting
-
-deps.linting:
+deps:
 	go install honnef.co/go/tools/cmd/staticcheck@latest
+	go install golang.org/x/tools/cmd/godoc@latest
 
 
 
@@ -86,8 +85,13 @@ cover.report:
 
 
 
-# DEPENDENCIES
+# DOCUMENTATION
 # -------------------------------------------------------
+
+# Run Godoc documentation server.
+docs:
+	@echo "View at http://localhost:3000/pkg/github.com/mdev5000/qlik_message"
+	godoc -http=:3000
 
 # Generate the API documentation using openapi.
 docs.api.gen:

@@ -1,3 +1,4 @@
+// Package apperrors is the core error handling package for the application.
 package apperrors
 
 import (
@@ -11,7 +12,10 @@ type errResponse struct {
 	Errors []interface{} `json:"errors"`
 }
 
-// Error https://middlemost.com/failure-is-your-domain/
+// Error is the primary application error object within the application. It manages useful information for logging and
+// can be used to determine the message type (ex. can be forwarded to the user or should be logged at return 500).
+// It is based on this article https://middlemost.com/failure-is-your-domain/.
+//
 type Error struct {
 	// The type of error. Determines how the error is handled, ex. ETInternal errors would result in internal logging
 	// of the error and a 500 response code being returned to the user.
@@ -50,6 +54,8 @@ func (e *Error) Is(err error) bool {
 	}
 }
 
+// StatusCode returns the HTTP status code for the given error. For most errors this will be 500, usually only errors
+// returning error responses (see HasResponse) will have a non-500 response codes.
 func StatusCode(err error) int {
 	switch e := err.(type) {
 	case *Error:
@@ -66,6 +72,9 @@ func StatusCode(err error) int {
 	}
 }
 
+// HasResponse indicates whether the error has a user response. A user response is an error message that can be returned
+// to the user (usually via JSON response) detailing to them what went wrong. Internal errors and non-application errors
+// will always return false.
 func HasResponse(err error) bool {
 	switch e := err.(type) {
 	case *Error:
@@ -77,6 +86,8 @@ func HasResponse(err error) bool {
 	return false
 }
 
+// ToJSON encodes an error to JSON. It will return an error if the error does not support sending a message to the end
+// user. An error that returns false to HasResponse cannot use ToJSON.
 func ToJSON(encoder *json.Encoder, err error) error {
 	switch e := err.(type) {
 	case *Error:
@@ -91,6 +102,7 @@ func ToJSON(encoder *json.Encoder, err error) error {
 	}
 }
 
+// IsInternal indicates if an error is intended to be shown to the end user.
 func IsInternal(err error) bool {
 	switch e := err.(type) {
 	case *Error:
@@ -100,15 +112,19 @@ func IsInternal(err error) bool {
 	}
 }
 
+// FieldErrorResponse is a error response meant for the end user indicating an error with a specific field.
 type FieldErrorResponse struct {
 	Field string `json:"field"`
 	Error string `json:"error"`
 }
 
+// ErrResponse is a error response meant for the end user detailing the error that occurred. See ErrorResponse for
+// example/
 type ErrResponse struct {
 	Error string `json:"error"`
 }
 
+// ErrorResponse creates an ErrResponse with a given message.
 func ErrorResponse(errMsg string) ErrResponse {
 	return ErrResponse{Error: errMsg}
 }

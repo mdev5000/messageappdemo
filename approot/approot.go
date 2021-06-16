@@ -1,3 +1,4 @@
+// Package approot acts as the connector between the core domain logic and external dependencies (ex. database).
 package approot
 
 import (
