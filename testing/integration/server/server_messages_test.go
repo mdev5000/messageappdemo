@@ -156,7 +156,7 @@ func TestMessage_canListMessages(t *testing.T) {
 
 	t.Run("with fields, pageSize, and pageStartIndex", func(t *testing.T) {
 		rr := httptest.NewRecorder()
-		h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?fields=message,isPalindrome&pageSize=2&pageStartIndex=1"))
+		h.ServeHTTP(rr, requestEmpty(t, "GET", "/messages?fields=message,isPalindrome&pageSize=2&pageStartIndex=2"))
 		requireJsonOk(t, rr)
 		expected := fmt.Sprintf(`{"messages":[` +
 			`{"message":"atttta","isPalindrome":true},` +

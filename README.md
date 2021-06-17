@@ -91,6 +91,13 @@ To tear the dev database down run:
 docker-compose down
 ```
 
+To run on docker locally use:
+
+```bash
+make dev.docker
+make dev.docker.down
+```
+
 ---
 
 ## Testing
@@ -197,4 +204,44 @@ ok  	github.com/mdev5000/messageappdemo/data	(cached)	coverage: 80.5% of stateme
 ?   	github.com/mdev5000/messageappdemo/postgres	[no test files]
 staticcheck ./...
 go vet ./...
+```
+
+# Deployment
+
+## Deploy via Heroku
+
+Install the heroku cli https://devcenter.heroku.com/articles/heroku-cli
+
+```bash
+git clone https://github.com/mdev5000/messageappdemo
+cd messageapidemo
+
+heroku login
+
+APP=<name of your heroku application>
+
+# Create an application.
+heroku create $APP
+
+# Setup heroku as a remote.
+heroku git:remote -a $APP
+
+# Create a postgres database for the application.
+heroku addons:create heroku-postgresql
+
+# Flag that the application should migrate the database schema before starting.
+heroku config:set MIGRATE=1 
+
+# Set the heroku application to use the docker container file.
+heroku stack:set container 
+
+# Push and start the application.
+git push heroku main
+
+# Create you first message.
+curl "https://$APP.herokuapp.com/messages" --data '{"message":"first"}' \
+-H 'Content-Type: application/json; charset=UTF-8'
+
+# And then retrieve it.
+curl "https://$APP.herokuapp.com/messages"
 ```

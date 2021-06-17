@@ -13,7 +13,7 @@ func GetQueryParams(op string, r *http.Request) (fields map[string]struct{}, lim
 
 	if limitS := r.URL.Query().Get("pageSize"); limitS != "" {
 		limit, err = strconv.ParseUint(limitS, 10, 64)
-		if err != nil {
+		if err != nil || limit < 1 {
 			re := ResponseError(op)
 			re.AddResponse("invalid pageSize value")
 			err = &re
@@ -23,7 +23,7 @@ func GetQueryParams(op string, r *http.Request) (fields map[string]struct{}, lim
 
 	if offsetS := r.URL.Query().Get("pageStartIndex"); offsetS != "" {
 		pageOffset, errPO := strconv.ParseUint(offsetS, 10, 64)
-		if errPO != nil {
+		if errPO != nil || pageOffset < 1 {
 			re := ResponseError(op)
 			re.AddResponse("invalid pageStartIndex value")
 			err = &re
@@ -32,7 +32,7 @@ func GetQueryParams(op string, r *http.Request) (fields map[string]struct{}, lim
 		if limit == 0 {
 			offset = pageOffset
 		} else {
-			offset = pageOffset * limit
+			offset = (pageOffset - 1) * limit
 		}
 	}
 
