@@ -120,7 +120,7 @@ type FieldErrorResponse struct {
 }
 
 // ErrResponse is a error response meant for the end user detailing the error that occurred. See ErrorResponse for
-// example/
+// an example.
 type ErrResponse struct {
 	Error string `json:"error"`
 }

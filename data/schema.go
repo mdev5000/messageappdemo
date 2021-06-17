@@ -12,11 +12,13 @@ create table if not exists messages (
 );
 `
 
+// SetupSchema sets up the current database schema. It is idempotent and is safe to run multiple times.
 func SetupSchema(db *postgres.DB) error {
 	_, err := db.Exec(Schema)
 	return err
 }
 
+// PurgeDb deletes all database form the database this should be used only for testing.
 func PurgeDb(db *postgres.DB) error {
 	if _, err := db.Exec("delete from messages"); err != nil {
 		return err

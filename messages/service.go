@@ -21,7 +21,7 @@ func NewService(log *logging.Logger, repo Repository) *Service {
 	}
 }
 
-// Create creates a new message. The message body cannot be empty and have a character limit of MaxMessageCharLength.
+// Create creates a new message. The message body cannot be empty and has a character limit of MaxMessageCharLength.
 func (ms *Service) Create(message ModifyMessage) (MessageId, error) {
 	const op = "MessagesService.Create"
 
@@ -56,7 +56,7 @@ func (ms *Service) Delete(id MessageId) error {
 	return ms.repo.DeleteById(id)
 }
 
-// Update updates a message. The message body cannot be empty and have a character limit of MaxMessageCharLength.
+// Update updates a message. The message body cannot be empty and has a character limit of MaxMessageCharLength.
 func (ms *Service) Update(id MessageId, message ModifyMessage) (MessageVersion, error) {
 	const op = "MessagesService.Update"
 

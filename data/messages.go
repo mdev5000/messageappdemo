@@ -21,7 +21,7 @@ type CreateMessage = messages.CreateMessage
 type ModifyMessage = messages.ModifyMessage
 type MessageQuery = messages.MessageQuery
 
-// MessagesRepository is the repository implementation for the messages Repository.
+// MessagesRepository is the repository implementation for the messages.Repository interface.
 type MessagesRepository struct {
 	db *postgres.DB
 }

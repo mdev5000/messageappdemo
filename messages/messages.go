@@ -63,24 +63,26 @@ type Message struct {
 	Message   string         `db:"message"`
 }
 
+// MessageQuery holds information for running a query against the messages store. Specifically it limits what fields
+// are returned and determines the pagination settings for the data.
 type MessageQuery struct {
 	Fields map[Field]struct{}
 	Limit  uint64
 	Offset uint64
 }
 
-// IsPalindrome determines is a Message is a palindrome.
+// IsPalindrome determines if a Message is a palindrome.
 //
 // Implementation decisions
 //
-// Prior to determining if a message is a palindrome it is encoded into NFC, since the service doesn't strictly require
+// Prior to determining if a message is a palindrome it is encoded into NFC. Since the service doesn't strictly require
 // posted messages to be in NFC and pre-converting the message to NFC could confuse users when their text does not match
-// what was originally saved. The conversion is done at the time of palindrome testing. This allows letters with
+// what was originally saved, the conversion is done at the time of palindrome testing. This allows letters with
 // combining characters to be treated as a single letter and allows for a more intuitive notion of what is a palindrome
 // (ex. éé).
 //
-// The implementation assumes extended grapheme clusters (ex. "🤦🏼‍♂️") are not palindromes. And more specifically
-// whether emojis are palindromes or not left largely undefined.
+// The implementation assumes extended grapheme clusters (ex. "🤦🏼‍♂️") are not palindromes. In general,  whether emojis
+// are palindromes or not is left largely undefined.
 //
 // There is no special handling for hidden characters. This may confuse users, so might be worth adjusting in the
 // future.
