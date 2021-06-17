@@ -24,10 +24,15 @@ deps:
 build:
 	@rm -rf _build
 	@mkdir -p _build
-	go build -o _build/messageapp ./cmd/messageapp/messageapp.go
-	@echo "App can be found at: _build/messageapp"
+	go build -o _build/messageapidemo ./cmd/messageapidemo/messageapidemo.go
+	@echo "App can be found at: _build/messageapidemo"
 
+# Build and start the application in a local docker environment.
+dev.docker:
+	docker-compose -f docker-compose-buildtest.yaml up -d --build
 
+dev.docker.down:
+	docker-compose -f docker-compose-buildtest.yaml down
 
 # LINTING + FORMATING
 # -------------------------------------------------------

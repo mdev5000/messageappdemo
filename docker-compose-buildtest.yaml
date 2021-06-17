@@ -1,0 +1,25 @@
+version: '2'
+services:
+
+  app:
+    build: .
+    container_name: app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db2
+    links:
+      - db2:pgdb
+    environment:
+      - MIGRATE=1
+      - DATABASE_URL=postgresql://postgres:postgres@pgdb?sslmode=disable
+      - PORT=8000
+
+  db2:
+    image: postgres:13.3
+    container_name: db2
+    restart: always
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres

@@ -68,7 +68,7 @@ docker-compose up -d
 MIGRATE=1 HOST=localhost PORT=10443 \
 KEY=_examples/cert/server.key CERT=_examples/cert/server.cert \
 DATABASE_URL=postgresql://postgres:postgres@localhost?sslmode=disable \
-./_build/messageapp -tls
+./_build/messageapidemo -tls
 ```
 
 ---
@@ -149,20 +149,22 @@ The API documentation is written in the `openapi` json specification generated u
 
 ```bash
 # list messages
-curl http://localhost:8080/messages
-curl http://localhost:8080/messages?fields=id,messsage&pageSize=20&pageStartIndex=2
+curl http://localhost:8000/messages
+curl http://localhost:8000/messages?fields=id,message&pageSize=20&pageStartIndex=2
 
 # view message
-curl http://localhost:8080/messages/5
+curl http://localhost:8000/messages/5
 
 # create message
-curl -X POST http://localhost:8080/messages --data '{"message":"my message"}'
+curl -X POST http://localhost:8000/messages --data '{"message":"first"}' \
+-H 'Content-Type: application/json; charset=UTF-8'
 
 # update message
-curl -X PUT http://localhost:8080/messages/5 --data '{"message":"new message"}'
+curl -X PUT http://localhost:8000/messages/1 --data '{"message":"new message"}' \
+-H 'Content-Type: application/json; charset=UTF-8'
 
 # delete message
-curl -X DELETE http://localhost:8080/messages/5
+curl -X DELETE http://localhost:8000/messages/1
 ```
 
 ### Update API documentation

@@ -1025,7 +1025,7 @@ ul.nav-tabs {
                         <div class="tab-content">
                           <div class="tab-pane active" id="examples-Default-messageList-0-curl">
                             <pre class="prettyprint"><code class="language-bsh">curl -X GET\
- -H "Accept: application/json"\
+ -H "Accept: application/json; charset=UTF-8"\
  "http://localhost:8000/messages?pageSize=&pageStartIndex=&fields="</code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Default-messageList-0-java">
@@ -1354,7 +1354,7 @@ Limits the returned fields to those specified here.
                                         var schemaWrapper = {
   "description" : "Returned when the request succeeded.",
   "content" : {
-    "application/json" : {
+    "application/json; charset=UTF-8" : {
       "schema" : {
         "$ref" : "#/components/schemas/SelectedMessage"
       }
@@ -1420,7 +1420,7 @@ Limits the returned fields to those specified here.
                                         var schemaWrapper = {
   "description" : "Returned if an error occurred while processing the request.",
   "content" : {
-    "application/json" : {
+    "application/json; charset=UTF-8" : {
       "schema" : {
         "$ref" : "#/components/schemas/ErrorResponse"
       }
@@ -1493,8 +1493,8 @@ Limits the returned fields to those specified here.
                         <div class="tab-content">
                           <div class="tab-pane active" id="examples-Message-messageCreate-0-curl">
                             <pre class="prettyprint"><code class="language-bsh">curl -X POST\
- -H "Accept: application/json"\
- -H "Content-Type: application/json"\
+ -H "Accept: application/json; charset=UTF-8"\
+ -H "Content-Type: application/json; charset=UTF-8"\
  "http://localhost:8000/messages"</code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Message-messageCreate-0-java">
@@ -1700,7 +1700,7 @@ pub fn main() {
 $(document).ready(function() {
   var schemaWrapper = {
   "content" : {
-    "application/json" : {
+    "application/json; charset=UTF-8" : {
       "schema" : {
         "$ref" : "#/components/schemas/MessageModify"
       }
@@ -1816,7 +1816,7 @@ $(document).ready(function() {
                                         var schemaWrapper = {
   "description" : "Returned if an error occurred while processing the request.",
   "content" : {
-    "application/json" : {
+    "application/json; charset=UTF-8" : {
       "schema" : {
         "$ref" : "#/components/schemas/ErrorResponse"
       }
@@ -2172,7 +2172,7 @@ Message Id
                         <div class="tab-content">
                           <div class="tab-pane active" id="examples-Message-messageGetById-0-curl">
                             <pre class="prettyprint"><code class="language-bsh">curl -X GET\
- -H "Accept: application/json"\
+ -H "Accept: application/json; charset=UTF-8"\
  "http://localhost:8000/messages/{id}"</code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Message-messageGetById-0-java">
@@ -2457,7 +2457,7 @@ Message Id
     }
   },
   "content" : {
-    "application/json" : {
+    "application/json; charset=UTF-8" : {
       "schema" : {
         "$ref" : "#/components/schemas/Message"
       }
@@ -2571,8 +2571,8 @@ Message Id
                         <div class="tab-content">
                           <div class="tab-pane active" id="examples-Message-messageUpdateById-0-curl">
                             <pre class="prettyprint"><code class="language-bsh">curl -X PUT\
- -H "Accept: application/json"\
- -H "Content-Type: application/json"\
+ -H "Accept: application/json; charset=UTF-8"\
+ -H "Content-Type: application/json; charset=UTF-8"\
  "http://localhost:8000/messages/{id}"</code></pre>
                           </div>
                           <div class="tab-pane" id="examples-Message-messageUpdateById-0-java">
@@ -2821,7 +2821,7 @@ Message Id
 $(document).ready(function() {
   var schemaWrapper = {
   "content" : {
-    "application/json" : {
+    "application/json; charset=UTF-8" : {
       "schema" : {
         "$ref" : "#/components/schemas/MessageModify"
       }
@@ -2931,7 +2931,7 @@ $(document).ready(function() {
                                         var schemaWrapper = {
   "description" : "Returned if an error occurred while processing the request.",
   "content" : {
-    "application/json" : {
+    "application/json; charset=UTF-8" : {
       "schema" : {
         "$ref" : "#/components/schemas/ErrorResponse"
       }

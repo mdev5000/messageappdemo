@@ -78,7 +78,7 @@ func requestEmpty(t *testing.T, method, url string) *http.Request {
 func request(t *testing.T, method, url string, body io.Reader) *http.Request {
 	req, err := http.NewRequest(method, url, body)
 	require.NoError(t, err)
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	return req
 }
 

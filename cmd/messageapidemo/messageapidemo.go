@@ -4,15 +4,14 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"net/http"
-	"os"
-	"time"
-
 	"github.com/mdev5000/messageappdemo/approot"
 	"github.com/mdev5000/messageappdemo/data"
 	"github.com/mdev5000/messageappdemo/logging"
 	"github.com/mdev5000/messageappdemo/postgres"
 	"github.com/mdev5000/messageappdemo/server"
+	"net/http"
+	"os"
+	"time"
 )
 
 func main() {
@@ -61,9 +60,6 @@ func run() error {
 	}
 
 	host := os.Getenv("HOST")
-	if host == "" {
-		host = "localhost"
-	}
 
 	cert := os.Getenv("CERT")
 	if cert == "" && tls {
@@ -80,7 +76,7 @@ func run() error {
 		migrate = true
 	}
 
-	db, err := postgres.OpenUrl(dbUrl)
+	db, err := connectDb(log, dbUrl)
 	if err != nil {
 		return err
 	}
@@ -122,4 +118,27 @@ func run() error {
 	} else {
 		return s.ListenAndServe()
 	}
+}
+
+func connectDb(log *logging.Logger, dbUrl string) (db *postgres.DB, err error) {
+	var i time.Duration
+	for i = 1; i < 10; i++ {
+		db, err = tryDb(dbUrl)
+		if err == nil {
+			return
+		}
+		log.LogError(err)
+		time.Sleep(i * 200 * time.Millisecond)
+	}
+	return
+}
+
+func tryDb(dbUrl string) (db *postgres.DB, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("failed to conntect to db (likely conn timeout)")
+		}
+	}()
+	db, err = postgres.OpenUrl(dbUrl)
+	return
 }

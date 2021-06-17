@@ -21,7 +21,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; charset=UTF-8": {
               "schema": {
                 "$ref": "#/components/schemas/MessageModify"
               }
@@ -52,7 +52,7 @@
           "400": {
             "description": "Returned if an error occurred while processing the request.",
             "content": {
-              "application/json": {
+              "application/json; charset=UTF-8": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
@@ -100,7 +100,7 @@
           "200": {
             "description": "Returned when the request succeeded.",
             "content": {
-              "application/json": {
+              "application/json; charset=UTF-8": {
                 "schema": {
                   "$ref": "#/components/schemas/SelectedMessage"
                 }
@@ -110,7 +110,7 @@
           "400": {
             "description": "Returned if an error occurred while processing the request.",
             "content": {
-              "application/json": {
+              "application/json; charset=UTF-8": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
@@ -152,7 +152,7 @@
               }
             },
             "content": {
-              "application/json": {
+              "application/json; charset=UTF-8": {
                 "schema": {
                   "$ref": "#/components/schemas/Message"
                 }
@@ -172,7 +172,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; charset=UTF-8": {
               "schema": {
                 "$ref": "#/components/schemas/MessageModify"
               }
@@ -195,7 +195,7 @@
           "400": {
             "description": "Returned if an error occurred while processing the request.",
             "content": {
-              "application/json": {
+              "application/json; charset=UTF-8": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }

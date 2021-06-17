@@ -49,7 +49,8 @@ func standardServiceMiddleware(h http.Handler) http.Handler {
 		// Ensure the content type is correctly set to json
 		switch r.Method {
 		case "POST", "PUT":
-			if r.Header.Get("Content-Type") != "application/json" {
+			// text/html; charset=UTF-8
+			if r.Header.Get("Content-Type") != handler.ContentTypeJson {
 				w.WriteHeader(http.StatusNotAcceptable)
 				return
 			}
