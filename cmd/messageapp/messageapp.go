@@ -11,6 +11,7 @@ import (
 	"github.com/mdev5000/qlik_message/server"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -21,7 +22,10 @@ func main() {
 
 func run() error {
 	var migrate bool
+	var tls bool
 	flag.BoolVar(&migrate, "migrate", false, "When set, migrations will be run prior to starting the application.")
+	flag.BoolVar(&tls, "tls", false, "When set, if the CERT and KEY environment variables are empty server will panic. This ensure the serve cannot be run in non-TLS mode.")
+
 	flag.Usage = func() {
 		fmt.Println("Message App")
 		fmt.Println("")
@@ -35,6 +39,8 @@ func run() error {
 		fmt.Println("")
 		fmt.Println("  DATABASE_URL       The url to the database. [required]")
 		fmt.Println("  MIGRATE            When set to 1, migrations will be run prior to starting the application.")
+		fmt.Println("  CERT            	  TLS certificate file to use.")
+		fmt.Println("  KEY            	  TLS key file to use.")
 		fmt.Println("")
 	}
 	flag.Parse()
@@ -56,6 +62,16 @@ func run() error {
 	host := os.Getenv("HOST")
 	if host == "" {
 		host = "localhost"
+	}
+
+	cert := os.Getenv("CERT")
+	if cert == "" && tls {
+		return fmt.Errorf("CERT environment variable cannot be empty")
+	}
+
+	key := os.Getenv("KEY")
+	if key == "" && tls {
+		return fmt.Errorf("KEY environment variable cannot be empty")
 	}
 
 	migrateEnv := os.Getenv("MIGRATE")
@@ -92,5 +108,17 @@ func run() error {
 
 	addr := fmt.Sprintf("%s:%s", host, port)
 	fmt.Printf("Running at %s\n", addr)
-	return http.ListenAndServe(addr, handler)
+	s := http.Server{
+		ReadTimeout:       15 * time.Second,
+		IdleTimeout:       15 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		ReadHeaderTimeout: 15 * time.Second,
+		Handler:           handler,
+		Addr:              addr,
+	}
+	if cert != "" {
+		return s.ListenAndServeTLS(cert, key)
+	} else {
+		return s.ListenAndServe()
+	}
 }

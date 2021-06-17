@@ -44,7 +44,7 @@ Top:
 }
 
 func noDbHandler(t *testing.T) http.Handler {
-	h, err := server.Handler(server.Services{}, server.Config{LogRequest: false})
+	h, err := server.Handler(server.Services{Log: logging.NoLog()}, server.Config{LogRequest: false})
 	require.NoError(t, err)
 	return h
 }

@@ -149,7 +149,7 @@ func TestMessage_canListMessages(t *testing.T) {
 			`{"message":"second message"},` +
 			`{"message":"atttta"},` +
 			`{"message":"last message"}` +
-			"]}\n")
+			`]}`)
 		require.Equal(t, expected, rr.Body.String())
 	})
 
@@ -160,7 +160,7 @@ func TestMessage_canListMessages(t *testing.T) {
 		expected := fmt.Sprintf(`{"messages":[` +
 			`{"message":"atttta","isPalindrome":true},` +
 			`{"message":"last message","isPalindrome":false}` +
-			"]}\n")
+			`]}`)
 		require.Equal(t, expected, rr.Body.String())
 	})
 
@@ -187,21 +187,21 @@ func TestMessage_whenListingMessages_errors(t *testing.T) {
 		rr := httptest.NewRecorder()
 		serve(t, db, rr, requestEmpty(t, "GET", "/messages?fields=id,notAField,version"))
 		require.Equal(t, http.StatusBadRequest, rr.Code)
-		require.Equal(t, "{\"errors\":[{\"error\":\"invalid messages fields: notAField\"}]}\n", rr.Body.String())
+		require.Equal(t, "{\"errors\":[{\"error\":\"invalid messages fields: notAField\"}]}", rr.Body.String())
 	})
 
 	t.Run("error when invalid page limit", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		serve(t, db, rr, requestEmpty(t, "GET", "/messages?pageSize=badSize"))
 		require.Equal(t, http.StatusBadRequest, rr.Code)
-		require.Equal(t, "{\"errors\":[\"invalid pageSize value\"]}\n", rr.Body.String())
+		require.Equal(t, "{\"errors\":[\"invalid pageSize value\"]}", rr.Body.String())
 	})
 
 	t.Run("error when invalid page start index", func(t *testing.T) {
 		rr := httptest.NewRecorder()
 		serve(t, db, rr, requestEmpty(t, "GET", "/messages?pageStartIndex=badIndex"))
 		require.Equal(t, http.StatusBadRequest, rr.Code)
-		require.Equal(t, "{\"errors\":[\"invalid pageStartIndex value\"]}\n", rr.Body.String())
+		require.Equal(t, "{\"errors\":[\"invalid pageStartIndex value\"]}", rr.Body.String())
 	})
 }
 
@@ -215,7 +215,7 @@ func TestMessage_errorOnBadId(t *testing.T) {
 			noDbServe(t, rr, requestEmpty(t, "GET", "/messages/duck"))
 			require.Equal(t, http.StatusBadRequest, rr.Code)
 			requireJson(t, rr)
-			require.Equal(t, "{\"errors\":[{\"error\":\"invalid message id\"}]}\n", rr.Body.String())
+			require.Equal(t, "{\"errors\":[{\"error\":\"invalid message id\"}]}", rr.Body.String())
 		})
 	}
 }
@@ -254,17 +254,17 @@ func TestMessages_createOrUpdateReturnsErrorWhen(t *testing.T) {
 		{
 			"empty message",
 			`{"message": ""}`,
-			`{"errors":[{"field":"message","error":"Message field cannot be blank."}]}` + "\n",
+			`{"errors":[{"field":"message","error":"Message field cannot be blank."}]}`,
 		},
 		{
 			"invalid json",
 			`{{`,
-			`{"errors":[{"error":"invalid json"}]}` + "\n",
+			`{"errors":[{"error":"invalid json"}]}`,
 		},
 		{
 			"empty json",
 			``,
-			`{"errors":[{"error":"invalid json"}]}` + "\n",
+			`{"errors":[{"error":"invalid json"}]}`,
 		},
 	}
 	methods := []struct {
@@ -371,7 +371,7 @@ func TestMessages_406NotAcceptableWhenInvalidContentType(t *testing.T) {
 			req.Header.Set("Content-Type", c.contentType)
 			h.ServeHTTP(rr, req)
 			require.Equal(t, http.StatusNotAcceptable, rr.Code)
-			require.Equal(t, "application/json", rr.Header().Get("Accept"))
+			require.Equal(t, "application/json; charset=UTF-8", rr.Header().Get("Accept"))
 		})
 	}
 }
@@ -401,7 +401,7 @@ func TestMessages_errorWhenRequestBodyIsTooBig(t *testing.T) {
 	body[len(body)-1] = '}'
 	noDbServe(t, rr, request(t, "POST", "/messages", bytes.NewBuffer(body)))
 	require.Equal(t, http.StatusBadRequest, rr.Code)
-	require.Equal(t, `{"errors":[{"error":"request body too large"}]}`+"\n", rr.Body.String())
+	require.Equal(t, `{"errors":[{"error":"request body too large"}]}`, rr.Body.String())
 }
 
 // helpers
@@ -412,5 +412,5 @@ func requireJsonOk(t *testing.T, rr *httptest.ResponseRecorder) {
 }
 
 func requireJson(t *testing.T, rr *httptest.ResponseRecorder) {
-	require.Equal(t, "application/json", rr.Header().Get("Content-Type"))
+	require.Equal(t, "application/json; charset=UTF-8", rr.Header().Get("Content-Type"))
 }

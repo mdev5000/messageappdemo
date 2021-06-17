@@ -7,7 +7,7 @@ All URIs are relative to *http://localhost:8000*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**messageList**](Apis/DefaultApi.md#messagelist) | **GET** /messages | List all or a subset of existing messages
+*DefaultApi* | [**messageList**](Apis/DefaultApi.md#messagelist) | **GET** /messages | List all or a subset of existing messages.
 *MessageApi* | [**messageCreate**](Apis/MessageApi.md#messagecreate) | **POST** /messages | Create a new message.
 *MessageApi* | [**messageDeleteById**](Apis/MessageApi.md#messagedeletebyid) | **DELETE** /messages/{id} | Delete a message.
 *MessageApi* | [**messageGetById**](Apis/MessageApi.md#messagegetbyid) | **GET** /messages/{id} | Retrieve an existing message.

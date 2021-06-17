@@ -63,7 +63,39 @@
       },
       "get": {
         "operationId": "messageList",
-        "description": "List all or a subset of existing messages",
+        "description": "List all or a subset of existing messages.",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Limits the number of returned rows.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 10
+          },
+          {
+            "name": "pageStartIndex",
+            "in": "query",
+            "description": "Determines query page number of a given size pageSize.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 3
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Limits the returned fields to those specified here.",
+            "schema": {
+              "type": "string",
+              "format": "csv"
+            },
+            "example": "id,message"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Returned when the request succeeded.",
@@ -71,6 +103,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SelectedMessage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Returned if an error occurred while processing the request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }

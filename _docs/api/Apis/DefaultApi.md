@@ -9,14 +9,19 @@ Method | HTTP request | Description
 
 <a name="messageList"></a>
 # **messageList**
-> SelectedMessage messageList()
+> SelectedMessage messageList(pageSize, pageStartIndex, fields)
 
 
 
-    List all or a subset of existing messages
+    List all or a subset of existing messages.
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pageSize** | **Integer**| Limits the number of returned rows. | [optional] [default to null]
+ **pageStartIndex** | **Integer**| Determines query page number of a given size pageSize. | [optional] [default to null]
+ **fields** | **String**| Limits the returned fields to those specified here. | [optional] [default to null]
 
 ### Return type
 

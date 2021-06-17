@@ -1,8 +1,6 @@
 package apperrors
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/stretchr/testify/require"
@@ -16,10 +14,9 @@ func TestToJSON_canEncodeToJSON(t *testing.T) {
 		Field: "myfield",
 		Error: "what went wrong",
 	})
-	b := bytes.NewBuffer(nil)
-	enc := json.NewEncoder(b)
-	require.NoError(t, ToJSON(enc, &e))
-	require.Equal(t, `{"errors":[{"field":"myfield","error":"what went wrong"}]}`+"\n", b.String())
+	d, err := ToJSON(&e)
+	require.NoError(t, err)
+	require.Equal(t, `{"errors":[{"field":"myfield","error":"what went wrong"}]}`, string(d))
 }
 
 func TestHasResponse_trueWhenInvalidAndContainsAResponse(t *testing.T) {

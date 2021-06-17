@@ -88,17 +88,17 @@ func HasResponse(err error) bool {
 
 // ToJSON encodes an error to JSON. It will return an error if the error does not support sending a message to the end
 // user. An error that returns false to HasResponse cannot use ToJSON.
-func ToJSON(encoder *json.Encoder, err error) error {
+func ToJSON(err error) ([]byte, error) {
 	switch e := err.(type) {
 	case *Error:
 		switch e.EType {
 		case ETInvalid:
-			return encoder.Encode(errResponse{e.Responses})
+			return json.Marshal(errResponse{e.Responses})
 		default:
-			return fmt.Errorf("error type for JSON, expected %s, but was %s", ETInvalid, e.EType)
+			return nil, fmt.Errorf("error type for JSON, expected %s, but was %s", ETInvalid, e.EType)
 		}
 	default:
-		return fmt.Errorf("error is not an application error, err: %w", err)
+		return nil, fmt.Errorf("error is not an application error, err: %w", err)
 	}
 }
 

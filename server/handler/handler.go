@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const ContentTypeJson = "application/json; charset=UTF-8"
+
 func DecodeJsonOrError(log *logging.Logger, op string, w http.ResponseWriter, r *http.Request, v interface{}) bool {
 	if r.Body == nil {
 		appErr := apperrors.Error{Op: op, EType: apperrors.ETInvalid}
@@ -43,18 +45,36 @@ func SendErrorResponse(log *logging.Logger, op string, w http.ResponseWriter, er
 	}
 
 	code := apperrors.StatusCode(err)
-	w.WriteHeader(code)
+
 	if !apperrors.HasResponse(err) {
+		w.WriteHeader(code)
 		return
 	}
 
-	contentTypeJson(w)
-	enc := json.NewEncoder(w)
-	if jsonErr := apperrors.ToJSON(enc, err); jsonErr != nil {
+	out, jsonErr := apperrors.ToJSON(err)
+	if jsonErr != nil {
 		log.LogFailedToEncode(op, err, jsonErr, errors.WithStack(jsonErr))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(code)
+	contentTypeJson(w)
+	writeData(op, log, w, out)
+}
+
+func writeData(op string, log *logging.Logger, w http.ResponseWriter, data []byte) bool {
+	if _, errWrite := w.Write(data); errWrite != nil {
+		log.LogError(&apperrors.Error{
+			EType:     apperrors.ETInternal,
+			Op:        op,
+			Err:       errWrite,
+			Stack:     errors.WithStack(errWrite),
+			Responses: nil,
+		})
+		return false
+	}
+	return true
 }
 
 func EncodeJsonOrError(op string, log *logging.Logger, w http.ResponseWriter, r *http.Request, v interface{}) bool {
@@ -63,17 +83,17 @@ func EncodeJsonOrError(op string, log *logging.Logger, w http.ResponseWriter, r 
 	if r.Method == "HEAD" {
 		return true
 	}
-	enc := json.NewEncoder(w)
-	if err := enc.Encode(v); err != nil {
-		log.LogFailedToEncode(op, err, err, errors.WithStack(err))
+	d, jsonErr := json.Marshal(v)
+	if jsonErr != nil {
+		log.LogFailedToEncode(op, jsonErr, jsonErr, errors.WithStack(jsonErr))
 		w.WriteHeader(http.StatusInternalServerError)
 		return false
 	}
-	return true
+	return writeData(op, log, w, d)
 }
 
 func contentTypeJson(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", ContentTypeJson)
 }
 
 func SetETagInt(w http.ResponseWriter, v int) {

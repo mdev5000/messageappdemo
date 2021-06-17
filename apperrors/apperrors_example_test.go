@@ -1,12 +1,10 @@
 package apperrors_test
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/mdev5000/qlik_message/apperrors"
 	errors2 "github.com/pkg/errors"
-	"os"
 )
 
 func ExampleError_userErrors() {
@@ -28,10 +26,11 @@ func ExampleError_userErrors() {
 	fmt.Println(apperrors.HasResponse(err))
 	fmt.Println(apperrors.StatusCode(err))
 
-	e := json.NewEncoder(os.Stdout)
-	if err := apperrors.ToJSON(e, err); err != nil {
-		panic(err)
+	d, jsonErr := apperrors.ToJSON(err)
+	if jsonErr != nil {
+		panic(jsonErr)
 	}
+	fmt.Print(string(d))
 
 	// Output:
 	// true
@@ -76,10 +75,11 @@ func ExampleFieldErrorResponse() {
 	})
 
 	var err error = &aErr
-	e := json.NewEncoder(os.Stdout)
-	if err := apperrors.ToJSON(e, err); err != nil {
-		panic(err)
+	d, jsonErr := apperrors.ToJSON(err)
+	if jsonErr != nil {
+		panic(jsonErr)
 	}
+	fmt.Print(string(d))
 
 	// Output:
 	// {"errors":[{"field":"myField","error":"this went wrong"}]}
@@ -98,10 +98,11 @@ func ExampleErrorResponse() {
 	aErr.AddResponse(apperrors.ErrorResponse("you did this wrong"))
 
 	var err error = &aErr
-	e := json.NewEncoder(os.Stdout)
-	if err := apperrors.ToJSON(e, err); err != nil {
-		panic(err)
+	d, jsonErr := apperrors.ToJSON(err)
+	if jsonErr != nil {
+		panic(jsonErr)
 	}
+	fmt.Print(string(d))
 
 	// Output:
 	// {"errors":[{"error":"you did this wrong"}]}

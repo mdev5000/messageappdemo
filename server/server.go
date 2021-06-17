@@ -33,10 +33,10 @@ func addSecureHeaders(w http.ResponseWriter) {
 	w.Header().Add("Content-Security-Policy", "frame-ancestors 'none'")
 }
 
-func standardServiceMiddleware(handler http.Handler) http.Handler {
+func standardServiceMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// This service only accepts json, so indicate to the client.
-		w.Header().Set("Accept", "application/json")
+		w.Header().Set("Accept", handler.ContentTypeJson)
 
 		addSecureHeaders(w)
 
@@ -54,7 +54,7 @@ func standardServiceMiddleware(handler http.Handler) http.Handler {
 			}
 		}
 
-		handler.ServeHTTP(w, r)
+		h.ServeHTTP(w, r)
 	})
 }
 
