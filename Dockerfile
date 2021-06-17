@@ -1,9 +1,9 @@
 FROM golang:1.16-alpine
 
-ADD . /go/src/messageapidemo
+ADD . /go/src/messageappdemo
 
-WORKDIR /go/src/messageapidemo
+WORKDIR /go/src/messageappdemo
 
-RUN go install ./cmd/messageapidemo/messageapidemo.go
+RUN go install ./cmd/messageappdemo/messageappdemo.go
 
-CMD ["messageapidemo"]
+CMD ["messageappdemo"]

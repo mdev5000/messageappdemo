@@ -45,19 +45,19 @@ make build
 To run specify the database to connect to, ex:
 
 ```bash
-HOST=localhost PORT=8000 DATABASE_URL=postgresql://user:password@host messageapp
+HOST=localhost PORT=8000 DATABASE_URL=postgresql://user:password@host messageappdemo
 ```
 
 You can run db migrations prior to running the app via:
 
 ```bash
-MIGRATE=1 ... messageapp
+MIGRATE=1 ... messageappdemo
 ```
 
 You can also run the server with TLS:
 
 ```bash
-KEY=key.pem CERT=certificate.pem ... messageapp -tls
+KEY=key.pem CERT=certificate.pem ... messageappdemo -tls
 ```
 
 Full local example:
@@ -68,7 +68,7 @@ docker-compose up -d
 MIGRATE=1 HOST=localhost PORT=10443 \
 KEY=_examples/cert/server.key CERT=_examples/cert/server.cert \
 DATABASE_URL=postgresql://postgres:postgres@localhost?sslmode=disable \
-./_build/messageapidemo -tls
+./_build/messageappdemo -tls
 ```
 
 ---
@@ -214,7 +214,7 @@ Install the heroku cli https://devcenter.heroku.com/articles/heroku-cli
 
 ```bash
 git clone https://github.com/mdev5000/messageappdemo
-cd messageapidemo
+cd messageappdemo
 
 heroku login
 

@@ -24,8 +24,8 @@ deps:
 build:
 	@rm -rf _build
 	@mkdir -p _build
-	go build -o _build/messageapidemo ./cmd/messageapidemo/messageapidemo.go
-	@echo "App can be found at: _build/messageapidemo"
+	go build -o _build/messageappdemo ./cmd/messageappdemo/messageappdemo.go
+	@echo "App can be found at: _build/messageappdemo"
 
 # Build and start the application in a local docker environment.
 dev.docker:
