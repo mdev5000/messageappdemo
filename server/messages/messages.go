@@ -2,14 +2,15 @@ package messages
 
 import (
 	"errors"
-	"github.com/gorilla/mux"
-	"github.com/mdev5000/qlik_message/apperrors"
-	"github.com/mdev5000/qlik_message/logging"
-	"github.com/mdev5000/qlik_message/messages"
-	"github.com/mdev5000/qlik_message/server/handler"
-	"github.com/mdev5000/qlik_message/server/uris"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
+	"github.com/mdev5000/messageappdemo/apperrors"
+	"github.com/mdev5000/messageappdemo/logging"
+	"github.com/mdev5000/messageappdemo/messages"
+	"github.com/mdev5000/messageappdemo/server/handler"
+	"github.com/mdev5000/messageappdemo/server/uris"
 )
 
 type Handler struct {

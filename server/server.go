@@ -3,17 +3,18 @@ package server
 
 import (
 	"fmt"
-	gmux "github.com/gorilla/mux"
-	"github.com/mdev5000/qlik_message/apperrors"
-	"github.com/mdev5000/qlik_message/logging"
-	msgs "github.com/mdev5000/qlik_message/messages"
-	"github.com/mdev5000/qlik_message/server/handler"
-	msgh "github.com/mdev5000/qlik_message/server/messages"
-	"github.com/pkg/errors"
-	"github.com/urfave/negroni"
 	"net/http"
 	"sort"
 	"strings"
+
+	gmux "github.com/gorilla/mux"
+	"github.com/mdev5000/messageappdemo/apperrors"
+	"github.com/mdev5000/messageappdemo/logging"
+	msgs "github.com/mdev5000/messageappdemo/messages"
+	"github.com/mdev5000/messageappdemo/server/handler"
+	msgh "github.com/mdev5000/messageappdemo/server/messages"
+	"github.com/pkg/errors"
+	"github.com/urfave/negroni"
 )
 
 type Services struct {

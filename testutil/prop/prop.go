@@ -5,9 +5,10 @@ package prop
 
 import (
 	"fmt"
-	"github.com/chrismcguire/gobberish"
 	"os"
 	"strconv"
+
+	"github.com/chrismcguire/gobberish"
 )
 
 const defaultNumCases = 2000

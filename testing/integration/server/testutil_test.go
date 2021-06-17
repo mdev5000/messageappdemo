@@ -2,14 +2,15 @@ package server
 
 import (
 	"bytes"
-	"github.com/mdev5000/qlik_message/approot"
-	"github.com/mdev5000/qlik_message/logging"
-	"github.com/mdev5000/qlik_message/postgres"
-	"github.com/mdev5000/qlik_message/server"
-	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
 	"testing"
+
+	"github.com/mdev5000/messageappdemo/approot"
+	"github.com/mdev5000/messageappdemo/logging"
+	"github.com/mdev5000/messageappdemo/postgres"
+	"github.com/mdev5000/messageappdemo/server"
+	"github.com/stretchr/testify/require"
 )
 
 var allMethods = []string{

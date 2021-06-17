@@ -5,11 +5,12 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mdev5000/qlik_message/apperrors"
-	"github.com/mdev5000/qlik_message/logging"
-	"github.com/pkg/errors"
 	"net/http"
 	"time"
+
+	"github.com/mdev5000/messageappdemo/apperrors"
+	"github.com/mdev5000/messageappdemo/logging"
+	"github.com/pkg/errors"
 )
 
 const ContentTypeJson = "application/json; charset=UTF-8"

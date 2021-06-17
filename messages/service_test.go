@@ -1,10 +1,11 @@
 package messages
 
 import (
-	"github.com/mdev5000/qlik_message/apperrors"
-	"github.com/mdev5000/qlik_message/logging"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/mdev5000/messageappdemo/apperrors"
+	"github.com/mdev5000/messageappdemo/logging"
+	"github.com/stretchr/testify/require"
 )
 
 // Used to setup a service for testing. Note the repo is nil since this is intended for test the do not use the

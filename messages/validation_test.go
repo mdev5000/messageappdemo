@@ -1,10 +1,11 @@
 package messages
 
 import (
-	"github.com/mdev5000/qlik_message/apperrors"
-	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
+
+	"github.com/mdev5000/messageappdemo/apperrors"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidation_errorWhenEmpty(t *testing.T) {

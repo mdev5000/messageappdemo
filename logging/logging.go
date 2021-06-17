@@ -4,11 +4,12 @@ package logging
 
 import (
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
-	"github.com/mdev5000/qlik_message/apperrors"
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
+
+	"github.com/davecgh/go-spew/spew"
+	"github.com/mdev5000/messageappdemo/apperrors"
+	"github.com/sirupsen/logrus"
 )
 
 const LogInfo = true

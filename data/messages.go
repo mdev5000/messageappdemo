@@ -4,13 +4,14 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	sq "github.com/Masterminds/squirrel"
-	"github.com/mdev5000/qlik_message/apperrors"
-	"github.com/mdev5000/qlik_message/messages"
-	"github.com/mdev5000/qlik_message/postgres"
-	errors2 "github.com/pkg/errors"
 	"strings"
 	"time"
+
+	sq "github.com/Masterminds/squirrel"
+	"github.com/mdev5000/messageappdemo/apperrors"
+	"github.com/mdev5000/messageappdemo/messages"
+	"github.com/mdev5000/messageappdemo/postgres"
+	errors2 "github.com/pkg/errors"
 )
 
 type MessageId = messages.MessageId

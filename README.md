@@ -1,4 +1,4 @@
-# Qlik message service
+# Message API Demo
 
 A REST service that allows clients to create and modify messages 
 and request information about the messages.
@@ -188,11 +188,11 @@ All tests should pass and no linting errors should be present, ex.:
 > make precommit
 go fmt ./...
 go test -race ./...
-ok  	github.com/mdev5000/qlik_message/data	(cached)
-?   	github.com/mdev5000/qlik_message/postgres	[no test files]
+ok  	github.com/mdev5000/messageappdemo/data	(cached)
+?   	github.com/mdev5000/messageappdemo/postgres	[no test files]
 go test -cover ./...
-ok  	github.com/mdev5000/qlik_message/data	(cached)	coverage: 80.5% of statements
-?   	github.com/mdev5000/qlik_message/postgres	[no test files]
+ok  	github.com/mdev5000/messageappdemo/data	(cached)	coverage: 80.5% of statements
+?   	github.com/mdev5000/messageappdemo/postgres	[no test files]
 staticcheck ./...
 go vet ./...
 ```

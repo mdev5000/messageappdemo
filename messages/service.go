@@ -2,8 +2,9 @@ package messages
 
 import (
 	"errors"
-	"github.com/mdev5000/qlik_message/apperrors"
-	"github.com/mdev5000/qlik_message/logging"
+
+	"github.com/mdev5000/messageappdemo/apperrors"
+	"github.com/mdev5000/messageappdemo/logging"
 )
 
 // Service is the primary interface between the domain and the outside layers of the application. All interaction with

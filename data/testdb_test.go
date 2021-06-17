@@ -1,11 +1,12 @@
 package data
 
 import (
-	"github.com/mdev5000/qlik_message/postgres"
-	"github.com/mdev5000/qlik_message/testutil/dbpool"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/mdev5000/messageappdemo/postgres"
+	"github.com/mdev5000/messageappdemo/testutil/dbpool"
 )
 
 var pool *dbpool.DbPool

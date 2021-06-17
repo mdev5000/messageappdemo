@@ -2,10 +2,11 @@ package messages
 
 import (
 	"encoding/json"
-	"github.com/mdev5000/qlik_message/messages"
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/mdev5000/messageappdemo/messages"
+	"github.com/stretchr/testify/require"
 )
 
 func TestQueryMessageValueToJson_canEncodeNoValues(t *testing.T) {

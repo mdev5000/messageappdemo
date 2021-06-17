@@ -1,4 +1,4 @@
-module github.com/mdev5000/qlik_message
+module github.com/mdev5000/messageappdemo
 
 go 1.16
 

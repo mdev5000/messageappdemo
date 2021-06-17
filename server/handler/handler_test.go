@@ -3,13 +3,14 @@ package handler
 import (
 	"bytes"
 	"errors"
-	"github.com/mdev5000/qlik_message/apperrors"
-	"github.com/mdev5000/qlik_message/logging"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"unsafe"
+
+	"github.com/mdev5000/messageappdemo/apperrors"
+	"github.com/mdev5000/messageappdemo/logging"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSendErrorResponse_internalErrorReturns500(t *testing.T) {

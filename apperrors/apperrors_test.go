@@ -3,9 +3,10 @@ package apperrors
 import (
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestToJSON_canEncodeToJSON(t *testing.T) {

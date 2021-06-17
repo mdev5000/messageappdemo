@@ -5,10 +5,11 @@ package messages
 import (
 	cryptorand "crypto/rand"
 	"encoding/binary"
-	"github.com/mdev5000/qlik_message/testutil/prop"
-	"golang.org/x/text/unicode/norm"
 	"math/rand"
 	"testing"
+
+	"github.com/mdev5000/messageappdemo/testutil/prop"
+	"golang.org/x/text/unicode/norm"
 )
 
 const maxLenPropString = 1024

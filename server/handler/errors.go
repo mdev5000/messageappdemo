@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/mdev5000/qlik_message/apperrors"
+	"github.com/mdev5000/messageappdemo/apperrors"
 	"github.com/pkg/errors"
 )
 

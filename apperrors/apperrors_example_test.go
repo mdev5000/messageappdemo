@@ -3,7 +3,8 @@ package apperrors_test
 import (
 	"errors"
 	"fmt"
-	"github.com/mdev5000/qlik_message/apperrors"
+
+	"github.com/mdev5000/messageappdemo/apperrors"
 	errors2 "github.com/pkg/errors"
 )
 

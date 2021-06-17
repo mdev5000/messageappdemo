@@ -2,11 +2,12 @@ package data
 
 import (
 	"errors"
-	"github.com/mdev5000/qlik_message/messages"
-	"github.com/mdev5000/qlik_message/postgres"
-	"github.com/stretchr/testify/require"
 	"sort"
 	"testing"
+
+	"github.com/mdev5000/messageappdemo/messages"
+	"github.com/mdev5000/messageappdemo/postgres"
+	"github.com/stretchr/testify/require"
 )
 
 func tMessageRepository(db *postgres.DB) *MessagesRepository {

@@ -1,6 +1,6 @@
 package data
 
-import "github.com/mdev5000/qlik_message/postgres"
+import "github.com/mdev5000/messageappdemo/postgres"
 
 const Schema = `
 create table if not exists messages (

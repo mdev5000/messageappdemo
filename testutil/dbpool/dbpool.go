@@ -3,9 +3,10 @@ package dbpool
 
 import (
 	"fmt"
-	"github.com/mdev5000/qlik_message/postgres"
-	"github.com/ory/dockertest/v3"
 	"log"
+
+	"github.com/mdev5000/messageappdemo/postgres"
+	"github.com/ory/dockertest/v3"
 )
 
 const testDbUser = "pguser"

@@ -2,10 +2,10 @@
 package approot
 
 import (
-	"github.com/mdev5000/qlik_message/data"
-	"github.com/mdev5000/qlik_message/logging"
-	"github.com/mdev5000/qlik_message/messages"
-	"github.com/mdev5000/qlik_message/postgres"
+	"github.com/mdev5000/messageappdemo/data"
+	"github.com/mdev5000/messageappdemo/logging"
+	"github.com/mdev5000/messageappdemo/messages"
+	"github.com/mdev5000/messageappdemo/postgres"
 )
 
 type Services struct {

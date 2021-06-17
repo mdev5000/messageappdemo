@@ -2,7 +2,8 @@ package messages
 
 import (
 	"fmt"
-	"github.com/mdev5000/qlik_message/apperrors"
+
+	"github.com/mdev5000/messageappdemo/apperrors"
 )
 
 func validateMessage(op string, message ModifyMessage) error {

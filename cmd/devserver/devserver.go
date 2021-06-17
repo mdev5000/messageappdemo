@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/mdev5000/qlik_message/approot"
-	"github.com/mdev5000/qlik_message/data"
-	"github.com/mdev5000/qlik_message/logging"
-	"github.com/mdev5000/qlik_message/messages"
-	"github.com/mdev5000/qlik_message/postgres"
-	"github.com/mdev5000/qlik_message/server"
 	"net/http"
+
+	"github.com/mdev5000/messageappdemo/approot"
+	"github.com/mdev5000/messageappdemo/data"
+	"github.com/mdev5000/messageappdemo/logging"
+	"github.com/mdev5000/messageappdemo/messages"
+	"github.com/mdev5000/messageappdemo/postgres"
+	"github.com/mdev5000/messageappdemo/server"
 )
 
 func main() {

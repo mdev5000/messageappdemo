@@ -2,8 +2,9 @@ package messages
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 func nowUTC() time.Time {

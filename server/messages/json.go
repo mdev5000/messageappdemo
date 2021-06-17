@@ -1,8 +1,9 @@
 package messages
 
 import (
-	"github.com/mdev5000/qlik_message/messages"
 	"time"
+
+	"github.com/mdev5000/messageappdemo/messages"
 )
 
 const (

@@ -4,17 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	msgs "github.com/mdev5000/qlik_message/messages"
-	"github.com/mdev5000/qlik_message/server"
-	"github.com/mdev5000/qlik_message/server/handler"
-	"github.com/mdev5000/qlik_message/server/messages"
-	"github.com/mdev5000/qlik_message/server/uris"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"strings"
 	"testing"
+
+	msgs "github.com/mdev5000/messageappdemo/messages"
+	"github.com/mdev5000/messageappdemo/server"
+	"github.com/mdev5000/messageappdemo/server/handler"
+	"github.com/mdev5000/messageappdemo/server/messages"
+	"github.com/mdev5000/messageappdemo/server/uris"
+	"github.com/stretchr/testify/require"
 )
 
 // POST - /messages, GET - /messages/{id}

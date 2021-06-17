@@ -90,7 +90,7 @@ cover.report:
 
 # Run Godoc documentation server.
 docs:
-	@echo "View at http://localhost:3000/pkg/github.com/mdev5000/qlik_message"
+	@echo "View at http://localhost:3000/pkg/github.com/mdev5000/messageappdemo"
 	godoc -http=:3000
 
 # Generate the API documentation using openapi.

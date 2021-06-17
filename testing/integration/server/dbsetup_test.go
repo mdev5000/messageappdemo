@@ -1,12 +1,13 @@
 package server
 
 import (
-	"github.com/mdev5000/qlik_message/data"
-	"github.com/mdev5000/qlik_message/postgres"
-	"github.com/mdev5000/qlik_message/testutil/dbpool"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/mdev5000/messageappdemo/data"
+	"github.com/mdev5000/messageappdemo/postgres"
+	"github.com/mdev5000/messageappdemo/testutil/dbpool"
 )
 
 var runDbTests bool
